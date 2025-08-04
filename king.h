@@ -27,5 +27,7 @@ king::king(bool White, pair<int, int> startingPosition)
 bool king:: IsCheck (vector<vector<piece *>> &board,pair<int,int> position)
 {
     //Needs to see if there is a piece that has a possible move to that square, if so the king can't move to that square
+
+
 }
 

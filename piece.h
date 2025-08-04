@@ -1,5 +1,6 @@
 #pragma once
 #include <bits/stdc++.h>
+#include "board.h"
 using namespace std;
 class piece
 {
@@ -7,7 +8,7 @@ private:
     pair<int, int> position;
     vector<pair<int, int>> possibleMoves;
     bool White;
-    string value = "";
+    string value ;
 
 public:
     piece(bool White, pair<int, int> startingPosition);
