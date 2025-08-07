@@ -53,14 +53,15 @@ for ( ;i < 8; i++)
 {
     if (secondCoord < 8 && secondCoord>=0 && firstCoord<8 && firstCoord>=0)
     {
-        if ((board[firstCoord][secondCoord]->getValue() == "■"
-        || board[firstCoord][secondCoord]->getValue() == "□"))
+        if ((board[firstCoord][secondCoord] == nullptr))
         {
             addPossibleMove({firstCoord,secondCoord});
         }
         else
         {
+            if (board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
             //capturable
+            }
             break;
         }
         

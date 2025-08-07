@@ -35,22 +35,33 @@ enum alpha {
 class board
 {
 private:
-    vector<vector<piece>> Board (8,8);
-    vector<piece>
+    vector<vector<piece*>> Board;
+    vector<piece> whitePieces;
+    vector<piece> blackPieces;
 public:
     board();
     vector<pair<int,int>> AttackedBy(pair<int,int> position); 
     //returns a vector containing positions of pieces attacking a given square
 
-    void setAt(pair<int,int> position,piece newPiece);
-    void getAt(pair<int,int> position);
+    void setAt(pair<int,int> position,piece* Pointer2piece);
+    piece* getAt(pair<int,int> position);
     void printBoardW();
     void printBoardB();
 };
 
-board::board (){
-
+board::board ()
+:Board(8, vector<piece*>(8, nullptr)){
+    
 }
+
+piece* board :: getAt(pair<int,int> position){
+    return Board[position.first][position.second];
+}
+
+void board :: setAt(pair<int,int> position,piece* Pointer2piece){
+    Board[position.first][position.second] = Pointer2piece;
+}
+
 
 void board :: printBoardB (){
     for (size_t i = 0; i < 8; i++)

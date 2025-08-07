@@ -28,30 +28,29 @@ bool pawn ::ISenpassant()
 
 void pawn ::checkMoves(vector<vector<piece*>>& board, pair<int, int> position)
 {
-    if (isWhite())
+    if (this->isWhite())
     {
-        if (position.first == 2)
-        {
-            if (board[3][position.second]->getValue() == "■" || board[3][position.second]->getValue() == "□")
-                addPossibleMove({3, position.second});
-            if (board[4][position.second]->getValue() == "■" || board[4][position.second]->getValue() == "□")
-            {
-                addPossibleMove({4, position.second});
-                enpassant = true;
-            }
-        }
-        else if (position.first+1 < 8){
+        if (position.first+1 < 8){
             if(position.first==6){
                 //Check promotion !!
             }
-            else if (board[position.first + 1][position.second]->getValue() == "■" 
-                || board[position.first + 1][position.second]->getValue() == "□")
+            if (position.first == 2)
             {
-                addPossibleMove({position.first + 1, position.second});
+                if (board[3][position.second]==nullptr)
+                    this->addPossibleMove({3, position.second});
+                if (board[4][position.second]==nullptr)
+                {
+                    this->addPossibleMove({4, position.second});
+                    enpassant = true;
+                }
+            }
+            else if (board[position.first + 1][position.second]==nullptr)
+            {
+                this->addPossibleMove({position.first + 1, position.second});
                 enpassant = false;
             }
-            if (position.second+1<8 &&(board[position.first + 1][position.second+1]->getValue() != "■" 
-                || board[position.first + 1][position.second+1]->getValue() != "□"))
+            
+            if (position.second+1<8 &&(board[position.first + 1][position.second+1] != nullptr))
             {
                 if(!board[position.first + 1][position.second+1]->isWhite()){
                     //Capturable Diagonally to the right
@@ -63,8 +62,7 @@ void pawn ::checkMoves(vector<vector<piece*>>& board, pair<int, int> position)
                     
             }
 
-            if (position.second-1>=0 &&(board[position.first + 1][position.second-1]->getValue() != "■" 
-                || board[position.first + 1][position.second-1]->getValue() != "□"))
+            if (position.second-1>=0 &&(board[position.first + 1][position.second-1]!= nullptr))
             {
                 if(!board[position.first + 1][position.second-1]->isWhite()){
                     //Capturable Diagonally to the left
@@ -74,31 +72,30 @@ void pawn ::checkMoves(vector<vector<piece*>>& board, pair<int, int> position)
                     ; 
                 }
             }
-
         }
     }
     else
     {
-        if (position.first == 7)
-        {
-            if (board[6][position.second]->getValue() == "■" || board[6][position.second]->getValue() == "□")
-                addPossibleMove({6, position.second});
-            if (board[5][position.second]->getValue() == "■" || board[5][position.second]->getValue() == "□")
-                {addPossibleMove({5, position.second});
-                enpassant = true;}
-        }
-        else if (position.first-1 >=0){
+        if (position.first-1 >=0){
             if(position.first==1){
                 //Check promotion !!
             }
-            else if (board[position.first - 1][position.second]->getValue() == "■" 
-                || board[position.first - 1][position.second]->getValue() == "□")
+            if (position.first == 7)
             {
-                addPossibleMove({position.first - 1, position.second});
+                if (board[6][position.second] ==nullptr)
+                    this->addPossibleMove({6, position.second});
+                if (board[5][position.second]==nullptr)
+                {
+                    this->addPossibleMove({5, position.second});
+                    enpassant = true;
+                }
+            }
+            else if (board[position.first - 1][position.second] == nullptr)
+            {
+                this->addPossibleMove({position.first - 1, position.second});
                 enpassant = false; //reseting enpassant possiblity after 1 extra move if it was true
             }
-            if (position.second+1<8 &&(board[position.first - 1][position.second+1]->getValue() != "■" 
-                || board[position.first - 1][position.second+1]->getValue() != "□"))
+            if (position.second+1<8 &&(board[position.first - 1][position.second+1]!=nullptr))
             {
                 if(!board[position.first - 1][position.second+1]->isWhite()){
                     //Capturable Diagonally to the left
@@ -110,8 +107,7 @@ void pawn ::checkMoves(vector<vector<piece*>>& board, pair<int, int> position)
                     
             }
 
-            if (position.second-1>=0 &&(board[position.first - 1][position.second-1]->getValue() != "■" 
-                || board[position.first - 1][position.second-1]->getValue() != "□"))
+            if (position.second-1>=0 &&(board[position.first - 1][position.second-1]!=nullptr))
             {
                 if(!board[position.first - 1][position.second-1]->isWhite()){
                     //Capturable Diagonally to the left

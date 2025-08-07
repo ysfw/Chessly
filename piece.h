@@ -13,12 +13,16 @@ private:
 public:
     piece(bool White, pair<int, int> startingPosition);
     virtual ~piece() {}
-    bool isWhite();
+    bool isWhite(){return White;};
     void updatePos(pair<int, int> newPosition);
     string getValue();
     void setValue(string);
     void addPossibleMove(pair<int, int> move);
 };
+piece :: piece (bool White, pair<int, int> startingPosition){
+    this->White = White;
+    this->position = startingPosition;
+}
 
 void piece::updatePos(pair<int, int> newPosition)
 {
@@ -45,9 +49,3 @@ class emptySquare : piece
 public:
     emptySquare(bool White, pair<int, int> position);
 };
-
-emptySquare::emptySquare(bool White, pair<int, int> position)
-    : piece(White, position)
-{
-    setValue((White) ? "■" : "□");
-}

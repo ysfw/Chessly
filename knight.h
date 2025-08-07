@@ -25,13 +25,12 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
     case 'r':
     if((position.first+1 < 8 && position.second+2 <8))    
     {
-        if ((board[position.first +1][position.second+2]->getValue() == "■" 
-            || board[position.first +1][position.second+2]->getValue() == "□"))
+        if (board[position.first +1][position.second+2] == nullptr)
         {
             addPossibleMove({position.first+1,position.second+2});
         }
         else{
-            if(board[position.first +1][position.second+2]->isWhite() != isWhite()){
+            if(board[position.first +1][position.second+2]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -39,13 +38,12 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
     
     if((position.first-1 >=0 && position.second+2 <8))    
     {
-        if ((board[position.first -1][position.second+2]->getValue() == "■" 
-            || board[position.first -1][position.second+2]->getValue() == "□"))
+        if (board[position.first -1][position.second+2] == nullptr)
         {
             addPossibleMove({position.first-1,position.second+2});
         }
         else{
-            if(board[position.first -1][position.second+2]->isWhite() != isWhite()){
+            if(board[position.first -1][position.second+2]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -55,13 +53,12 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
     case 'l':
         if((position.first+1 < 8 && position.second-2 >=0))    
     {
-        if ((board[position.first +1][position.second-2]->getValue() == "■" 
-            || board[position.first +1][position.second-2]->getValue() == "□"))
+        if ((board[position.first +1][position.second-2] == nullptr))
         {
             addPossibleMove({position.first+1,position.second-2});
         }
         else{
-            if(board[position.first +1][position.second-2]->isWhite() != isWhite()){
+            if(board[position.first +1][position.second-2]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -69,13 +66,12 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
     
     if((position.first-1 >=0 && position.second-2 >=0))    
     {
-        if ((board[position.first -1][position.second-2]->getValue() == "■" 
-            || board[position.first -1][position.second-2]->getValue() == "□"))
+        if ((board[position.first -1][position.second-2] == nullptr))
         {
             addPossibleMove({position.first-1,position.second-2});
         }
         else{
-            if(board[position.first -1][position.second-2]->isWhite() != isWhite()){
+            if(board[position.first -1][position.second-2]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -84,13 +80,12 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
         
     case 'u':
         if(position.first+2 < 8 && position.second+1 <8){
-            if ((board[position.first + 2][position.second+1]->getValue() == "■" 
-                || board[position.first + 2][position.second+1]->getValue() == "□"))
+            if ((board[position.first + 2][position.second+1] == nullptr))
             {
                 addPossibleMove({position.first+2,position.second+1});
             }
             else{
-                if(board[position.first +2][position.second+1]->isWhite() != isWhite()){
+                if(board[position.first +2][position.second+1]->isWhite() != this->isWhite()){
                 //capturable
             }
             }
@@ -98,14 +93,13 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
         
         if(position.first+2 < 8 && position.second-1 >=0)
         {
-        if ((board[position.first + 2][position.second-1]->getValue() == "■" 
-            || board[position.first + 2][position.second-1]->getValue() == "□"))
+        if ((board[position.first + 2][position.second-1] == nullptr))
         {
             addPossibleMove({position.first+2,position.second-1});
         }
         else
         {
-            if(board[position.first +2][position.second-1]->isWhite() != isWhite()){
+            if(board[position.first +2][position.second-1]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -115,14 +109,13 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
     case 'd':
     if (position.first-2 >=0 && position.second+1 <8)
     {
-        if ((board[position.first - 2][position.second+1]->getValue() == "■" 
-            || board[position.first - 2][position.second+1]->getValue() == "□"))
+        if ((board[position.first - 2][position.second+1]==nullptr))
         {
             addPossibleMove({position.first-2,position.second+1});
         }
         else
         {
-            if(board[position.first -2][position.second+1]->isWhite() != isWhite()){
+            if(board[position.first -2][position.second+1]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
@@ -131,14 +124,13 @@ void Knight :: movesHelper(vector<vector<piece *>> &board, pair<int, int> positi
 
     if(position.first-2 >=0 && position.second-1 >=0)
     {
-        if ((board[position.first - 2][position.second-1]->getValue() == "■" 
-            || board[position.first - 2][position.second-1]->getValue() == "□"))
+        if ((board[position.first - 2][position.second-1]==nullptr))
         {
             addPossibleMove({position.first-2,position.second-1});
         }
         else
         {
-            if(board[position.first -2][position.second-1]->isWhite() != isWhite()){
+            if(board[position.first -2][position.second-1]->isWhite() != this->isWhite()){
                 //capturable
             }
         }
