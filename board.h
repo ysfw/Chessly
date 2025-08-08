@@ -23,9 +23,6 @@
 using namespace std;
 
 
-
-
-
 class board
 {
 private:

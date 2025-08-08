@@ -6,21 +6,38 @@ using namespace std;
 class player
 {
 private:
-    stack<pair<piece,string>> moves;
-    stack<pair<piece,string>> captured;
+    bool White;
+    stack<pair<pair<piece*,string>,bool>> moves; //the boolean is used to check whether the move was a capture or not
+    stack<pair<piece*,string>> captured;
+    pair<piece*,string> undoneMove;
+    pair<piece*,string> undoneCapture;
     pair<int,int> time; //minute:second
     int rating;
 public:
-    player(int initialRating, pair<int,int> gameTime);
+    player(bool isWhite);
+    bool isWhite() {return White;};
+    void addMove(pair<pair<piece*,string>,bool> move);
+    void addCapture(pair<piece*,string> capture);
+    void undo();
+    void redo();
     ~player();
 
 };
 
-player::player(int initialRating, pair<int,int> gameTime)
+player::player(bool isWhite)
 {
-    rating = initialRating;
-    time = gameTime;
+    this->White=isWhite;
 }
+
+void player :: addMove (pair<pair<piece*,string>,bool> move){
+    this -> moves.push(move);
+}
+
+void player :: addCapture(pair<piece*,string> capture) {
+    this -> captured.push(capture);
+}
+
+
 
 player::~player()
 {

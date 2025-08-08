@@ -1,15 +1,16 @@
 #pragma once
 #include <bits/stdc++.h>
+#include "../board.h"
 #include "piece.h"
 using namespace std;
 
 class bishop : public piece
 {
 private:
-    void movesHelper(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition,int direction);
+    void movesHelper(board &Board, pair<size_t,size_t> currPosition,int direction);
 public:
     bishop(bool isWhite, pair<size_t,size_t> startingPosition);
-    void checkMoves(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition);
+    void checkMoves(board &Board, pair<size_t,size_t> currPosition);
 };
 
 bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
@@ -18,7 +19,7 @@ bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
     setValue(isWhite ? "♝":"♗");    
 }
 
-void bishop:: movesHelper(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition,int direction) 
+void bishop:: movesHelper(board &Board, pair<size_t,size_t> currPosition,int direction) 
 {
     size_t firstCoord, secondCoord;
     size_t i=1;
@@ -54,13 +55,13 @@ for ( ;i < 8; i++)
 {
     if (secondCoord < 8 && firstCoord<8)
     {
-        if ((board[firstCoord][secondCoord] == nullptr))
+        if ((Board.getAt({firstCoord,secondCoord}) == nullptr))
         {
             addPossibleMove({firstCoord,secondCoord});
         }
         else
         {
-            if (board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
+            if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite()){
             //capturable
             }
             break;
@@ -70,10 +71,10 @@ for ( ;i < 8; i++)
 }      
 }
 
-void bishop :: checkMoves(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition)
+void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
 {
-    movesHelper(board,currPosition,1);
-    movesHelper(board,currPosition,2);
-    movesHelper(board,currPosition,3);
-    movesHelper(board,currPosition,4);
+    movesHelper(Board,currPosition,1);
+    movesHelper(Board,currPosition,2);
+    movesHelper(Board,currPosition,3);
+    movesHelper(Board,currPosition,4);
 }
