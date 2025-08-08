@@ -6,45 +6,45 @@ using namespace std;
 class queen : public piece
 {
 private:
-    void straightmovesHelper(vector<vector<piece *>> &board, pair<int, int> position,char direction);
-    void diagonalmovesHelper(vector<vector<piece *>> &board, pair<int, int> position,int direction);
+    void straightmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,char direction);
+    void diagonalmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,int direction);
 public:
-    queen(bool White, pair<int, int> startingPosition);
-    void checkMoves(vector<vector<piece *>> &board, pair<int, int> position);
+    queen(bool White, pair<size_t, size_t> startingPosition);
+    void checkMoves(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition);
 };
 
-queen::queen(bool White, pair<int, int> startingPosition)
-    : piece(White, startingPosition)
+queen::queen(bool isWhite, pair<size_t, size_t> startingPosition)
+    : piece(isWhite, startingPosition)
 {
-    setValue(White ? "♛":"♕");
+    setValue(isWhite ? "♛":"♕");
 }
 
 
 
-void queen:: straightmovesHelper(vector<vector<piece *>> &board, pair<int, int> position,char direction)
+void queen:: straightmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,char direction)
 {
-    int firstCoord, secondCoord,i=1;
+    size_t firstCoord, secondCoord,i=1;
     
     switch (direction)
     {
     case 'r':
-        firstCoord = position.first;
-        secondCoord = position.second +i;
+        firstCoord = currPosition.first;
+        secondCoord = currPosition.second +i;
     break;
     
     case 'l':
-        firstCoord = position.first;
-        secondCoord = position.second -i;
+        firstCoord = currPosition.first;
+        secondCoord = currPosition.second -i;
     break;
 
     case 'u':
-        firstCoord = position.first+i;
-        secondCoord = position.second;
+        firstCoord = currPosition.first+i;
+        secondCoord = currPosition.second;
     break;
 
     case 'd':
-        firstCoord = position.first-i;
-        secondCoord = position.second;
+        firstCoord = currPosition.first-i;
+        secondCoord = currPosition.second;
     break;
 
 
@@ -54,7 +54,7 @@ void queen:: straightmovesHelper(vector<vector<piece *>> &board, pair<int, int> 
 
 for ( ;i < 8; i++)
 {
-    if (secondCoord < 8 && secondCoord>=0 && firstCoord<8 && firstCoord>=0)
+    if (secondCoord < 8 && firstCoord<8 )
     {
         if ((board[firstCoord][secondCoord]==nullptr))
         {
@@ -73,30 +73,30 @@ for ( ;i < 8; i++)
 }
 
 
-void queen:: diagonalmovesHelper(vector<vector<piece *>> &board, pair<int, int> position,int direction) 
+void queen:: diagonalmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,int direction) 
 {
-    int firstCoord, secondCoord,i=1;
+    size_t firstCoord, secondCoord,i=1;
     
     switch (direction)
     {
     case 1://Right Diagonal Up
-        firstCoord = position.first + i;
-        secondCoord = position.second +i;
+        firstCoord = currPosition.first + i;
+        secondCoord = currPosition.second +i;
     break;
     
     case 2://Left Diagonal Down
-        firstCoord = position.first + i;
-        secondCoord = position.second -i;
+        firstCoord = currPosition.first + i;
+        secondCoord = currPosition.second -i;
     break;
 
     case 3://Right Diagonal Down
-        firstCoord = position.first-i;
-        secondCoord = position.second+i;
+        firstCoord = currPosition.first-i;
+        secondCoord = currPosition.second+i;
     break;
 
     case 4://left Diagonal Down
-        firstCoord = position.first-i;
-        secondCoord = position.second-i;
+        firstCoord = currPosition.first-i;
+        secondCoord = currPosition.second-i;
     break;
 
 
@@ -106,7 +106,7 @@ void queen:: diagonalmovesHelper(vector<vector<piece *>> &board, pair<int, int> 
 
 for ( ;i < 8; i++)
 {
-    if (secondCoord < 8 && secondCoord>=0 && firstCoord<8 && firstCoord>=0)
+    if (secondCoord < 8 && firstCoord<8)
     {
         if ((board[firstCoord][secondCoord]==nullptr))
         {
@@ -125,17 +125,17 @@ for ( ;i < 8; i++)
 }
 
 
-void queen::checkMoves(vector<vector<piece *>> &board, pair<int, int> position)
+void queen::checkMoves(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition)
 {
-    straightmovesHelper(board,position,'r');
-    straightmovesHelper(board,position,'l');
-    straightmovesHelper(board,position,'u');
-    straightmovesHelper(board,position,'d');
+    straightmovesHelper(board,currPosition,'r');
+    straightmovesHelper(board,currPosition,'l');
+    straightmovesHelper(board,currPosition,'u');
+    straightmovesHelper(board,currPosition,'d');
 
-    diagonalmovesHelper(board,position,1);
-    diagonalmovesHelper(board,position,2);
-    diagonalmovesHelper(board,position,3);
-    diagonalmovesHelper(board,position,4);
+    diagonalmovesHelper(board,currPosition,1);
+    diagonalmovesHelper(board,currPosition,2);
+    diagonalmovesHelper(board,currPosition,3);
+    diagonalmovesHelper(board,currPosition,4);
 }
 
 

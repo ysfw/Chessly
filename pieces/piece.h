@@ -5,50 +5,49 @@ using namespace std;
 class piece
 {
 private:
-    pair<int, int> position;
+    pair<size_t,size_t>  position;
     bool White;
     string value ;
-    /// @brief 
-    vector<pair<int, int>> possibleMoves;
+    vector<pair<size_t,size_t>> possibleMoves;
 
 public:
     piece();
-    piece(bool isWhite, pair<int, int> startingPosition);
+    piece(bool isWhite, pair<size_t,size_t> startingPosition);
     virtual ~piece() {}
     bool isWhite(){return White;};
-    void updatePos(pair<int, int> newPosition);
-    pair<int, int> getPosition();
+    void updatePos(pair<size_t,size_t> newPosition);
+    pair<size_t,size_t> getPosition();
     string getValue();
     void setValue(string);
-    void addPossibleMove(pair<int, int> move);
+    void addPossibleMove(pair<size_t,size_t> move);
 
 };
 
-piece :: piece (bool white, pair<int, int> startingPosition)
-    : position(startingPosition), White(white), value(""), possibleMoves() {}
+piece :: piece (bool isWhite, pair<size_t,size_t> startingPosition)
+    : position(startingPosition), White(isWhite), value(""), possibleMoves() {}
 
 piece::piece()
-    : position({-1, -1}), White(false), value(""), possibleMoves() {}
+    : position({0,0}), White(false), value(""), possibleMoves() {}
 
-pair<int, int> piece::getPosition()
+pair<size_t,size_t> piece::getPosition()
 {
-    return position;
+    return this->position;
 }
 
-void piece::updatePos(pair<int, int> newPosition)
+void piece::updatePos(pair<size_t,size_t> newPosition)
 {
-    position = newPosition;
+    this->position = newPosition;
 }
 
 string piece:: getValue(){
     return value;
 }
 
-void piece::setValue(string value){
-    value = value;
+void piece::setValue(string newValue){
+    this->value = newValue;
 }
 
-void piece:: addPossibleMove(pair<int, int> move){
+void piece:: addPossibleMove(pair<size_t,size_t> move){
     possibleMoves.push_back(move);
 }
 

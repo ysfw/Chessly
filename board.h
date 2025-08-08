@@ -1,8 +1,3 @@
-//{R,N,B,K,Q,N,R}
-//8*P
-//4 checkered rows
-//8*P
-//{R,N,B,K,Q,N,R}
 
 //     string Board[8][8] = {
 //     {"♜","♞","♝","♚","♛","♝","♞","♜"},
@@ -14,6 +9,8 @@
 //     {"♙","♙","♙","♙","♙","♙","♙","♙"},
 //     {"♖","♘","♗","♔","♕","♗","♘","♖"}
 // };
+
+
 #pragma once
 #include <bits/stdc++.h>
 #include "pieces/piece.h"
@@ -37,11 +34,11 @@ private:
     map<string,piece*> blackPieces;
 public:
     board();
-    vector<pair<int,int>> AttackedBy(pair<int,int> position); 
+    vector<pair<unsigned int,unsigned int>> AttackedBy(pair<size_t,size_t> position); 
     //returns a vector containing positions of pieces attacking a given square
 
-    void setAt(pair<int,int> position,piece* Pointer2piece);
-    piece* getAt(pair<int,int> position);
+    void setAt(pair<size_t,size_t> position,piece* Pointer2piece);
+    piece* getAt(pair<size_t,size_t> position);
     void printBoardW();
     void printBoardB();
 };
@@ -56,8 +53,8 @@ board::board ()
     whitePieces.insert({"f1", new bishop(true,{0,5})});
     whitePieces.insert({"g1", new Knight(true,{0,6})});
     whitePieces.insert({"h1", new rook(true,{0,7})});
-    for (int i = 0; i < 8; i++)    whitePieces.insert({static_cast<char>('a' + i) + "2", new pawn(true,{1,i})});
-    
+    for (size_t i = 0; i < 8; i++)    whitePieces.insert({string(1, 'a' + i) + "2", new pawn(true,{1,i})});
+
     blackPieces.insert({"a8", new rook(false,{7,0})});
     blackPieces.insert({"b8", new Knight(false,{7,1})});
     blackPieces.insert({"c8", new bishop(false,{7,2})});
@@ -66,37 +63,22 @@ board::board ()
     blackPieces.insert({"f8", new bishop(false,{7,5})});
     blackPieces.insert({"g8", new Knight(false,{7,6})});
     blackPieces.insert({"h8", new rook(false,{7,7})});
-    for (int i = 0; i < 8; i++)    blackPieces.insert({static_cast<char>('a' + i) + "7", new pawn(false,{6,i})});
-    
-    for(int i=0; i < 8; i++){
-        string pos1 = string(1, static_cast<char>('a' + i)) + "1";
-        int firstcoord = whitePieces[pos1]->getPosition().first;
-        int secondcoord = whitePieces[pos1]->getPosition().second;
-        Board[static_cast<size_t>(firstcoord)][static_cast<size_t>(secondcoord)] = whitePieces[pos1];
+    for (size_t i = 0; i < 8; i++)    blackPieces.insert({string(1, 'a' + i) + "7", new pawn(false,{6,i})});
 
-        string pos2 = string(1, static_cast<char>('a' + i)) + "2";
-        firstcoord = whitePieces[pos2]->getPosition().first;
-        secondcoord = whitePieces[pos2]->getPosition().second;
-        Board[static_cast<size_t>(firstcoord)][static_cast<size_t>(secondcoord)] = whitePieces[pos2];
-
-        string pos8 = string(1, static_cast<char>('a' + i)) + "8";
-        firstcoord = blackPieces[pos8]->getPosition().first;
-        secondcoord = blackPieces[pos8]->getPosition().second;
-        Board[static_cast<size_t>(firstcoord)][static_cast<size_t>(secondcoord)] = blackPieces[pos8];
-
-        string pos7 = string(1, static_cast<char>('a' + i)) + "7";
-        firstcoord = blackPieces[pos7]->getPosition().first;
-        secondcoord = blackPieces[pos7]->getPosition().second;
-        Board[static_cast<size_t>(firstcoord)][static_cast<size_t>(secondcoord)] = blackPieces[pos7];
+    for(size_t i=0; i < 8; i++){
+        for(size_t j=0; j < 8; j++){
+            if (i == 0 || i == 1) Board[i][j] = whitePieces[static_cast<char>('a' + j) + std::to_string(i+1)];
+            else if (i == 6 || i == 7) Board[i][j] = blackPieces[static_cast<char>('a' + j) + std::to_string(i+1)];
+        }
     }
 
 }
 
-piece* board :: getAt(pair<int,int> position){
+piece* board :: getAt(pair<size_t,size_t> position){
     return Board[position.first][position.second];
 }
 
-void board :: setAt(pair<int,int> position,piece* Pointer2piece){
+void board :: setAt(pair<size_t,size_t> position,piece* Pointer2piece){
     Board[position.first][position.second] = Pointer2piece;
 }
 
@@ -132,7 +114,7 @@ void board :: printBoardW (){
         cout<<'\n';
     }
     cout<<"  ";
-    for (int i = 0; i < 8; i++)
+    for (size_t i = 0; i < 8; i++)
         cout << static_cast<char>('a' + i) << ' ';   
     cout<<'\n';
 }

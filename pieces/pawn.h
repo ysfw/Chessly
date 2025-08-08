@@ -10,15 +10,15 @@ private:
     bool enpassant = false;
 
 public:
-    pawn(bool White, pair<int, int> startingPosition);
+    pawn(bool isWhite,pair<size_t,size_t> startingPosition);
     bool ISenpassant();
-    void checkMoves(vector<vector<piece*>>& board, pair<int, int> position);
+    void checkMoves(vector<vector<piece*>>& board,pair<size_t,size_t> currPosition);
 };
 
-pawn::pawn(bool White, pair<int, int> startingPosition)
-    : piece(White, startingPosition)
+pawn::pawn(bool isWhite,pair<size_t,size_t> startingPosition)
+    : piece(isWhite, startingPosition)
 {
-    setValue(White ?  "♟" : "♙");
+    setValue(isWhite ?  "♟" : "♙");
 }
 
 bool pawn ::ISenpassant()
@@ -26,95 +26,91 @@ bool pawn ::ISenpassant()
     return enpassant;
 }
 
-void pawn ::checkMoves(vector<vector<piece*>>& board, pair<int, int> position)
+void pawn ::checkMoves(vector<vector<piece*>>& board,pair<size_t,size_t> currPosition)
 {
     if (this->isWhite())
     {
-        if (position.first+1 < 8){
-            if(position.first==6){
+        if (currPosition.first+1 < 8){
+            if(currPosition.first==6){
                 //Check promotion !!
             }
-            if (position.first == 2)
+            if (currPosition.first == 2)
             {
-                if (board[3][position.second]==nullptr)
-                    this->addPossibleMove({3, position.second});
-                if (board[4][position.second]==nullptr)
+                if (board[3][currPosition.second]==nullptr)
+                    this->addPossibleMove({3, currPosition.second});
+                if (board[4][currPosition.second]==nullptr)
                 {
-                    this->addPossibleMove({4, position.second});
+                    this->addPossibleMove({4, currPosition.second});
                     enpassant = true;
                 }
             }
-            else if (board[position.first + 1][position.second]==nullptr)
+            else if (board[currPosition.first + 1][currPosition.second]==nullptr)
             {
-                this->addPossibleMove({position.first + 1, position.second});
+                this->addPossibleMove({currPosition.first + 1, currPosition.second});
                 enpassant = false;
             }
-            
-            if (position.second+1<8 &&(board[position.first + 1][position.second+1] != nullptr))
+
+            if (currPosition.second+1<8 &&(board[currPosition.first + 1][currPosition.second+1] != nullptr))
             {
-                if(!board[position.first + 1][position.second+1]->isWhite()){
+                if(!board[currPosition.first + 1][currPosition.second+1]->isWhite()){
                     //Capturable Diagonally to the right
                 }
-                if (pawn* p = dynamic_cast<pawn*>(board[position.first][position.second+1])) {
-                    if(p->ISenpassant()) //en passant , Capturable Diagonally to the right
-                    ; 
+                if (pawn* p = dynamic_cast<pawn*>(board[currPosition.first][currPosition.second+1])) {
+                    if(p->ISenpassant()){} //en passant , Capturable Diagonally to the right
                 }
                     
             }
 
-            if (position.second-1>=0 &&(board[position.first + 1][position.second-1]!= nullptr))
+            if (currPosition.second-1 < 8 &&(board[currPosition.first + 1][currPosition.second-1]!= nullptr))
             {
-                if(!board[position.first + 1][position.second-1]->isWhite()){
+                if(!board[currPosition.first + 1][currPosition.second-1]->isWhite()){
                     //Capturable Diagonally to the left
                 }
-                if (pawn* p = dynamic_cast<pawn*>(board[position.first][position.second-1])) {
-                    if(p->ISenpassant()) //en passant , Capturable Diagonally to the right
-                    ; 
+                if (pawn* p = dynamic_cast<pawn*>(board[currPosition.first][currPosition.second-1])) {
+                    if(p->ISenpassant()){} //en passant , Capturable Diagonally to the right
                 }
             }
         }
     }
     else
     {
-        if (position.first-1 >=0){
-            if(position.first==1){
+        if (currPosition.first-1 < 8){
+            if(currPosition.first==1){
                 //Check promotion !!
             }
-            if (position.first == 7)
+            if (currPosition.first == 7)
             {
-                if (board[6][position.second] ==nullptr)
-                    this->addPossibleMove({6, position.second});
-                if (board[5][position.second]==nullptr)
+                if (board[6][currPosition.second] ==nullptr)
+                    this->addPossibleMove({6, currPosition.second});
+                if (board[5][currPosition.second]==nullptr)
                 {
-                    this->addPossibleMove({5, position.second});
+                    this->addPossibleMove({5, currPosition.second});
                     enpassant = true;
                 }
             }
-            else if (board[position.first - 1][position.second] == nullptr)
+            else if (board[currPosition.first - 1][currPosition.second] == nullptr)
             {
-                this->addPossibleMove({position.first - 1, position.second});
+                this->addPossibleMove({currPosition.first - 1, currPosition.second});
                 enpassant = false; //reseting enpassant possiblity after 1 extra move if it was true
             }
-            if (position.second+1<8 &&(board[position.first - 1][position.second+1]!=nullptr))
+            if (currPosition.second+1<8 &&(board[currPosition.first - 1][currPosition.second+1]!=nullptr))
             {
-                if(!board[position.first - 1][position.second+1]->isWhite()){
+                if(!board[currPosition.first - 1][currPosition.second+1]->isWhite()){
                     //Capturable Diagonally to the left
                 }
-                if (pawn* p = dynamic_cast<pawn*>(board[position.first][position.second+1])) {
-                    if(p->ISenpassant()) //en passant , Capturable Diagonally to the left
-                    ; 
+                if (pawn* p = dynamic_cast<pawn*>(board[currPosition.first][currPosition.second+1])) {
+                    if(p->ISenpassant()){} //en passant , Capturable Diagonally to the left
                 }
                     
             }
 
-            if (position.second-1>=0 &&(board[position.first - 1][position.second-1]!=nullptr))
+            if (currPosition.second-1 < 8 &&(board[currPosition.first - 1][currPosition.second-1]!=nullptr))
             {
-                if(!board[position.first - 1][position.second-1]->isWhite()){
+                if(!board[currPosition.first - 1][currPosition.second-1]->isWhite()){
                     //Capturable Diagonally to the left
                 }
-                if (pawn* p = dynamic_cast<pawn*>(board[position.first][position.second-1])) {
-                    if(p->ISenpassant()) //en passant , Capturable Diagonally to the left
-                    ; 
+                if (pawn* p = dynamic_cast<pawn*>(board[currPosition.first][currPosition.second-1])) {
+                    if(p->ISenpassant()){} //en passant , Capturable Diagonally to the left
                 }
             }
 

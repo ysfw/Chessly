@@ -6,42 +6,43 @@ using namespace std;
 class bishop : public piece
 {
 private:
-    void movesHelper(vector<vector<piece *>> &board, pair<int, int> position,int direction);
+    void movesHelper(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition,int direction);
 public:
-    bishop(bool White, pair<int, int> startingPosition);
-    void checkMoves(vector<vector<piece *>> &board, pair<int, int> position);
+    bishop(bool isWhite, pair<size_t,size_t> startingPosition);
+    void checkMoves(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition);
 };
 
-bishop::bishop(bool White, pair<int, int> startingPosition)
-    : piece(White, startingPosition)
+bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
+    : piece(isWhite, startingPosition)
 {
-    setValue(White ? "♝":"♗");    
+    setValue(isWhite ? "♝":"♗");    
 }
 
-void bishop:: movesHelper(vector<vector<piece *>> &board, pair<int, int> position,int direction) 
+void bishop:: movesHelper(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition,int direction) 
 {
-    int firstCoord, secondCoord,i=1;
+    size_t firstCoord, secondCoord;
+    size_t i=1;
     
     switch (direction)
     {
     case 1://Right Diagonal Up
-        firstCoord = position.first + i;
-        secondCoord = position.second +i;
+        firstCoord = currPosition.first + i;
+        secondCoord = currPosition.second +i;
     break;
     
     case 2://Left Diagonal Down
-        firstCoord = position.first + i;
-        secondCoord = position.second -i;
+        firstCoord = currPosition.first + i;
+        secondCoord = currPosition.second -i;
     break;
 
     case 3://Right Diagonal Down
-        firstCoord = position.first-i;
-        secondCoord = position.second+i;
+        firstCoord = currPosition.first-i;
+        secondCoord = currPosition.second+i;
     break;
 
     case 4://left Diagonal Down
-        firstCoord = position.first-i;
-        secondCoord = position.second-i;
+        firstCoord = currPosition.first-i;
+        secondCoord = currPosition.second-i;
     break;
 
 
@@ -51,7 +52,7 @@ void bishop:: movesHelper(vector<vector<piece *>> &board, pair<int, int> positio
 
 for ( ;i < 8; i++)
 {
-    if (secondCoord < 8 && secondCoord>=0 && firstCoord<8 && firstCoord>=0)
+    if (secondCoord < 8 && firstCoord<8)
     {
         if ((board[firstCoord][secondCoord] == nullptr))
         {
@@ -69,10 +70,10 @@ for ( ;i < 8; i++)
 }      
 }
 
-void bishop :: checkMoves(vector<vector<piece *>> &board, pair<int, int> position)
+void bishop :: checkMoves(vector<vector<piece *>> &board, pair<size_t,size_t> currPosition)
 {
-    movesHelper(board,position,1);
-    movesHelper(board,position,2);
-    movesHelper(board,position,3);
-    movesHelper(board,position,4);
+    movesHelper(board,currPosition,1);
+    movesHelper(board,currPosition,2);
+    movesHelper(board,currPosition,3);
+    movesHelper(board,currPosition,4);
 }

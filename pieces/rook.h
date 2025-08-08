@@ -3,8 +3,7 @@
 #include "piece.h"
 using namespace std;
 
-class rook : public piece
-{
+class rook : public piece {
 private:
     bool canCastle;
 
@@ -14,17 +13,17 @@ private:
     because by anymeans this will be called in all four directions, so it doesn't really matter. 
     Variations of this function will be used in other pieces for the same purpose of reducing redundancy. 
     */
-    void movesHelper(vector<vector<piece *>> &board, pair<int, int> position,char direction);
+    void movesHelper(vector<vector<piece *>> &Board, pair<size_t, size_t> currPos,char direction);
 public:
-    rook(bool White, pair<int, int> position);
+    rook(bool White, pair<size_t, size_t> startingPosition);
     bool checkRookCastle();
-    void checkMoves(vector<vector<piece *>> &board, pair<int, int> position);
+    void checkMoves(vector<vector<piece *>> &Board, pair<size_t, size_t> currPos);
 };
 
-rook::rook(bool White, pair<int, int> startingPosition)
-    : piece(White, startingPosition)
+rook::rook(bool isWhite, pair<size_t, size_t> startingPosition)
+    : piece(isWhite, startingPosition)
 {
-    setValue(White ? "♜" : "♖");
+    setValue(isWhite ? "♜" : "♖");
     canCastle = true;
 }
 
@@ -34,30 +33,30 @@ bool rook::checkRookCastle()
 }
 
 
-void rook::movesHelper(vector<vector<piece *>> &board, pair<int, int> position,char direction)
+void rook::movesHelper(vector<vector<piece *>> &Board, pair<size_t, size_t> currPos,char direction)
 {
-    int firstCoord, secondCoord,i=1;
+    size_t firstCoord, secondCoord,i=1;
     
     switch (direction)
     {
         case 'r':
-        firstCoord = position.first;
-        secondCoord = position.second +i;
+        firstCoord = currPos.first;
+        secondCoord = currPos.second +i;
     break;
     
     case 'l':
-        firstCoord = position.first;
-        secondCoord = position.second -i;
+        firstCoord = currPos.first;
+        secondCoord = currPos.second -i;
     break;
 
     case 'u':
-        firstCoord = position.first+i;
-        secondCoord = position.second;
+        firstCoord = currPos.first+i;
+        secondCoord = currPos.second;
     break;
 
     case 'd':
-        firstCoord = position.first-i;
-        secondCoord = position.second;
+        firstCoord = currPos.first-i;
+        secondCoord = currPos.second;
     break;
 
 
@@ -67,15 +66,15 @@ void rook::movesHelper(vector<vector<piece *>> &board, pair<int, int> position,c
 
 for ( ;i < 8; i++)
 {
-    if (secondCoord < 8 && secondCoord>=0 && firstCoord<8 && firstCoord>=0)
+    if (secondCoord < 8 && firstCoord<8 )
     {
-        if (board[firstCoord][secondCoord] == nullptr)
+        if (Board[firstCoord][secondCoord] == nullptr)
         {
             addPossibleMove({firstCoord,secondCoord});
         }
         else
         {
-            if (board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
+            if (Board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
             //capturable
             }
             break;
@@ -86,11 +85,11 @@ for ( ;i < 8; i++)
 }
 
 
-void rook::checkMoves(vector<vector<piece *>> &board, pair<int, int> position)
+void rook::checkMoves(vector<vector<piece *>> &board, pair<size_t, size_t> currPos)
 {
-    movesHelper(board,position,'r');
-    movesHelper(board,position,'l');
-    movesHelper(board,position,'u');
-    movesHelper(board,position,'d');
+    movesHelper(board,currPos,'r');
+    movesHelper(board,currPos,'l');
+    movesHelper(board,currPos,'u');
+    movesHelper(board,currPos,'d');
 
 }
