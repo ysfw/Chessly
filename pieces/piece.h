@@ -2,6 +2,8 @@
 #include <bits/stdc++.h>
 #include "board.h"
 using namespace std;
+class player;
+
 class piece
 {
 private:
@@ -20,6 +22,9 @@ public:
     string getValue();
     void setValue(string);
     void addPossibleMove(pair<size_t,size_t> move);
+    void Move(board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition);
+    void Capture(board &Board,pair<size_t,size_t> position,pair<size_t,size_t> capturedPosition);
+    
 
 };
 
@@ -110,31 +115,3 @@ void checkMoves(board &Board, pair<size_t, size_t> currPosition);
 
 
 
-
-piece :: piece (bool isWhite, pair<size_t,size_t> startingPosition)
-    : position(startingPosition), White(isWhite), value(""), possibleMoves() {}
-
-piece::piece()
-    : position({0,0}), White(false), value(""), possibleMoves() {}
-
-pair<size_t,size_t> piece::getPosition()
-{
-    return this->position;
-}
-
-void piece::updatePos(pair<size_t,size_t> newPosition)
-{
-    this->position = newPosition;
-}
-
-string piece:: getValue(){
-    return value;
-}
-
-void piece::setValue(string newValue){
-    this->value = newValue;
-}
-
-void piece:: addPossibleMove(pair<size_t,size_t> move){
-    possibleMoves.push_back(move);
-}

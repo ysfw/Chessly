@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include "board.h"
-#include "game.h"
+#include "player.h"
 using namespace std;
 
 int main (){
@@ -18,6 +18,7 @@ while (true){
     }
     
 
-
     
+}
+
 }
