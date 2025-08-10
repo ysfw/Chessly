@@ -1,17 +1,4 @@
-#pragma once
-#include <bits/stdc++.h>
-#include "../board.h"
 #include "piece.h"
-using namespace std;
-
-class bishop : public piece
-{
-private:
-    void movesHelper(board &Board, pair<size_t,size_t> currPosition,int direction);
-public:
-    bishop(bool isWhite, pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board, pair<size_t,size_t> currPosition);
-};
 
 bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
     : piece(isWhite, startingPosition)

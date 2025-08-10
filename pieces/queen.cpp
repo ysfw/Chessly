@@ -1,18 +1,4 @@
-#pragma once
-#include <bits/stdc++.h>
 #include "piece.h"
-using namespace std;
-
-class queen : public piece
-{
-private:
-    void straightmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,char direction);
-    void diagonalmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,int direction);
-public:
-    queen(bool White, pair<size_t, size_t> startingPosition);
-    void checkMoves(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition);
-};
-
 queen::queen(bool isWhite, pair<size_t, size_t> startingPosition)
     : piece(isWhite, startingPosition)
 {
@@ -21,7 +7,7 @@ queen::queen(bool isWhite, pair<size_t, size_t> startingPosition)
 
 
 
-void queen:: straightmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,char direction)
+void queen:: straightmovesHelper(board &Board, pair<size_t, size_t> currPosition,char direction)
 {
     size_t firstCoord, secondCoord,i=1;
     
@@ -56,13 +42,13 @@ for ( ;i < 8; i++)
 {
     if (secondCoord < 8 && firstCoord<8 )
     {
-        if ((board[firstCoord][secondCoord]==nullptr))
+        if ((Board.getAt({firstCoord,secondCoord})==nullptr))
         {
             addPossibleMove({firstCoord,secondCoord});
         }
         else
         {
-        if (board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
+        if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite()){
             //capturable
             }
             break;
@@ -73,7 +59,7 @@ for ( ;i < 8; i++)
 }
 
 
-void queen:: diagonalmovesHelper(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition,int direction) 
+void queen:: diagonalmovesHelper(board &Board, pair<size_t, size_t> currPosition,int direction) 
 {
     size_t firstCoord, secondCoord,i=1;
     
@@ -108,13 +94,13 @@ for ( ;i < 8; i++)
 {
     if (secondCoord < 8 && firstCoord<8)
     {
-        if ((board[firstCoord][secondCoord]==nullptr))
+        if ((Board.getAt({firstCoord,secondCoord})==nullptr))
         {
             addPossibleMove({firstCoord,secondCoord});
         }
         else
         {
-        if (board[firstCoord][secondCoord]->isWhite() != this->isWhite()){
+        if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite()){
             //capturable
             }
             break;
@@ -125,17 +111,17 @@ for ( ;i < 8; i++)
 }
 
 
-void queen::checkMoves(vector<vector<piece *>> &board, pair<size_t, size_t> currPosition)
+void queen::checkMoves(board &Board, pair<size_t, size_t> currPosition)
 {
-    straightmovesHelper(board,currPosition,'r');
-    straightmovesHelper(board,currPosition,'l');
-    straightmovesHelper(board,currPosition,'u');
-    straightmovesHelper(board,currPosition,'d');
+    straightmovesHelper(Board,currPosition,'r');
+    straightmovesHelper(Board,currPosition,'l');
+    straightmovesHelper(Board,currPosition,'u');
+    straightmovesHelper(Board,currPosition,'d');
 
-    diagonalmovesHelper(board,currPosition,1);
-    diagonalmovesHelper(board,currPosition,2);
-    diagonalmovesHelper(board,currPosition,3);
-    diagonalmovesHelper(board,currPosition,4);
+    diagonalmovesHelper(Board,currPosition,1);
+    diagonalmovesHelper(Board,currPosition,2);
+    diagonalmovesHelper(Board,currPosition,3);
+    diagonalmovesHelper(Board,currPosition,4);
 }
 
 

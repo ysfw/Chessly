@@ -13,13 +13,7 @@
 
 #pragma once
 #include <bits/stdc++.h>
-#include "pieces/piece.h"
-#include "pieces/rook.h"
-#include "pieces/bishop.h"
-#include "pieces/knight.h"
-#include "pieces/king.h"
-#include "pieces/queen.h"
-#include "pieces/pawn.h"
+#include "piece.h"
 using namespace std;
 
 
