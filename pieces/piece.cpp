@@ -1,6 +1,6 @@
 #include "piece.h"
 #include "player.h"
-
+#include "helpers.h"
 
 piece :: piece (bool isWhite, pair<size_t,size_t> startingPosition)
     : position(startingPosition), White(isWhite), value(""), possibleMoves() {}
@@ -27,5 +27,30 @@ void piece::setValue(string newValue){
 }
 
 void piece:: addPossibleMove(pair<size_t,size_t> move){
-    possibleMoves.push_back(move);
+    possibleMoves.insert(move);
+}
+
+
+bool piece :: Move(player *player,board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition)
+{
+    piece* curr = (Board.getAt({oldPosition.first,oldPosition.second}));
+    piece* next = (Board.getAt({newPosition.first,newPosition.second}));
+    curr->checkMoves(Board,oldPosition);
+    if(binary_search(curr->possibleMoves.begin(),curr->possibleMoves.end(),newPosition))
+    {
+        if(binary_search(curr->possibleCaptures.begin(),curr->possibleCaptures.end(),newPosition)){
+            
+            player->addMove({{curr,moveTOstring(oldPosition)},true});  
+            player->addCapture({next,moveTOstring(newPosition)});
+            curr->updatePos(newPosition);
+            Board.setAt(oldPosition,nullptr);
+        }
+        else {
+            player->addMove({{curr,moveTOstring(oldPosition)},false});  
+            curr->updatePos(newPosition);
+            Board.setAt(oldPosition,nullptr);
+        }
+        return true;
+    }
+    else return false; //can't move in that direction 
 }

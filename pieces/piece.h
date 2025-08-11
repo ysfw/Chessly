@@ -10,7 +10,8 @@ private:
     pair<size_t,size_t>  position;
     bool White;
     string value ;
-    vector<pair<size_t,size_t>> possibleMoves;
+    set<pair<size_t,size_t>> possibleMoves;
+    set<pair<size_t,size_t>> possibleCaptures;
 
 public:
     piece();
@@ -22,8 +23,8 @@ public:
     string getValue();
     void setValue(string);
     void addPossibleMove(pair<size_t,size_t> move);
-    void Move(board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition);
-    void Capture(board &Board,pair<size_t,size_t> position,pair<size_t,size_t> capturedPosition);
+    bool Move(player *player,board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition);
+    virtual void checkMoves(board &Board, pair<size_t,size_t> currPosition);
     
 
 };
@@ -43,7 +44,7 @@ class rook : public piece {
    public:
    rook(bool White, pair<size_t, size_t> startingPosition);
    bool checkRookCastle();
-   void checkMoves(board &Board, pair<size_t, size_t> currPos);
+   void checkMoves(board &Board, pair<size_t, size_t> currPos)override;
 };
 
 
@@ -53,7 +54,7 @@ class bishop : public piece
     void movesHelper(board &Board, pair<size_t,size_t> currPosition,int direction);
     public:
     bishop(bool isWhite, pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board, pair<size_t,size_t> currPosition);
+    void checkMoves(board &Board, pair<size_t,size_t> currPosition)override;
 };
 
 
@@ -66,7 +67,7 @@ class king : public piece
     public:
     king(bool White, pair<int, int> startingPosition);
     bool InCheck(){return inCheck;}
-    void checkMoves(board &Board, pair<int, int> position);
+    void checkMoves(board &Board, pair<size_t, size_t> position)override;
     
 };
 
@@ -76,7 +77,7 @@ class Knight : public piece
     void movesHelper(board &Board, pair<size_t,size_t> currPosition,char direction);
     public:
     Knight(bool White, pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board, pair<size_t,size_t> currPosition);
+    void checkMoves(board &Board, pair<size_t,size_t> currPosition)override;
 };
 
 
@@ -89,7 +90,7 @@ class pawn : public piece
     public:
     pawn(bool isWhite,pair<size_t,size_t> startingPosition);
     bool ISenpassant();
-    void checkMoves(board &Board,pair<size_t,size_t> currPosition);
+    void checkMoves(board &Board,pair<size_t,size_t> currPosition)override;
 };
 
 pawn::pawn(bool isWhite,pair<size_t,size_t> startingPosition)
@@ -110,7 +111,7 @@ void straightmovesHelper(board &Board, pair<size_t, size_t> currPosition,char di
 void diagonalmovesHelper(board &Board, pair<size_t, size_t> currPosition,int direction);
 public:
 queen(bool White, pair<size_t, size_t> startingPosition);
-void checkMoves(board &Board, pair<size_t, size_t> currPosition);
+void checkMoves(board &Board, pair<size_t, size_t> currPosition)override;
 };
 
 
