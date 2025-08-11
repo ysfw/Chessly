@@ -23,6 +23,7 @@ public:
     string getValue();
     void setValue(string);
     void addPossibleMove(pair<size_t,size_t> move);
+    void addPossibleCapture(pair<size_t,size_t> move);
     bool Move(player *player,board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition);
     virtual void checkMoves(board &Board, pair<size_t,size_t> currPosition);
     
@@ -89,8 +90,10 @@ class pawn : public piece
     
     public:
     pawn(bool isWhite,pair<size_t,size_t> startingPosition);
-    bool ISenpassant();
     void checkMoves(board &Board,pair<size_t,size_t> currPosition)override;
+    bool ISenpassant();
+    void resetenpassant(){enpassant=false;};
+    //this piece of horrible code should be in game logic because you obviously need to reset after each move but rn you can only reset if the piece is a pawn and that's totally incorrect
 };
 
 pawn::pawn(bool isWhite,pair<size_t,size_t> startingPosition)

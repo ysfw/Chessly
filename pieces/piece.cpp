@@ -30,6 +30,10 @@ void piece:: addPossibleMove(pair<size_t,size_t> move){
     possibleMoves.insert(move);
 }
 
+void piece:: addPossibleCapture(pair<size_t,size_t> move){
+    possibleCaptures.insert(move);
+}
+
 
 bool piece :: Move(player *player,board &Board,pair<size_t,size_t> oldPosition,pair<size_t,size_t> newPosition)
 {
@@ -50,6 +54,7 @@ bool piece :: Move(player *player,board &Board,pair<size_t,size_t> oldPosition,p
             curr->updatePos(newPosition);
             Board.setAt(oldPosition,nullptr);
         }
+        
         return true;
     }
     else return false; //can't move in that direction 

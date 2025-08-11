@@ -50,6 +50,8 @@ for ( ;i < 8; i++)
         {
             if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite()){
             //capturable
+            addPossibleMove({firstCoord,secondCoord});
+            addPossibleCapture({firstCoord,secondCoord});
             }
             break;
         }

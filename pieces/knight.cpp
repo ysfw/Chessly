@@ -49,6 +49,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
         else{
             if(Board.getAt({currPosition.first +1,currPosition.second-2})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first +1,currPosition.second-2});
+                addPossibleCapture({currPosition.first +1,currPosition.second-2});
             }
         }
     }
@@ -62,6 +64,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
         else{
             if(Board.getAt({currPosition.first -1,currPosition.second-2})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first -1,currPosition.second-2});
+                addPossibleCapture({currPosition.first -1,currPosition.second-2});
             }
         }
     }    
@@ -76,6 +80,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
             else{
                 if(Board.getAt({currPosition.first +2,currPosition.second+1})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first +2,currPosition.second+1});
+                addPossibleCapture({currPosition.first +2,currPosition.second+1});
             }
             }
         }
@@ -90,6 +96,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
         {
             if(Board.getAt({currPosition.first +2,currPosition.second-1})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first +2,currPosition.second-1});
+                addPossibleCapture({currPosition.first +2,currPosition.second-1});
             }
         }
         }
@@ -106,6 +114,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
         {
             if(Board.getAt({currPosition.first -2,currPosition.second+1})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first -2,currPosition.second+1});
+                addPossibleCapture({currPosition.first -2,currPosition.second+1});
             }
         }
         
@@ -121,6 +131,8 @@ void Knight :: movesHelper(board &Board, pair<size_t,size_t> currPosition,char d
         {
             if(Board.getAt({currPosition.first -2,currPosition.second-1})->isWhite() != this->isWhite()){
                 //capturable
+                addPossibleMove({currPosition.first -2,currPosition.second-1});
+                addPossibleCapture({currPosition.first -2,currPosition.second-1});
             }
         }
     }
