@@ -1,7 +1,20 @@
 #include "piece.h"
+#include "board.h"
+
+pawn::pawn(bool isWhite,pair<size_t,size_t> startingPosition)
+: piece(isWhite, startingPosition)
+{
+    setValue(isWhite ?  "♟" : "♙");
+}
+
+bool pawn ::ISenpassant()
+{
+    return enpassant;
+}
 
 void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
 {
+    clearMoves();
     if (this->isWhite())
     {
         if (currPosition.first + 1 < 8)
@@ -10,13 +23,13 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
             {
                 // Check promotion !!
             }
-            if (currPosition.first == 2)
+            if (currPosition.first == 1)
             {
+                if (Board.getAt({2, currPosition.second}) == nullptr)
+                    this->addPossibleMove({2, currPosition.second});
                 if (Board.getAt({3, currPosition.second}) == nullptr)
-                    this->addPossibleMove({3, currPosition.second});
-                if (Board.getAt({4, currPosition.second}) == nullptr)
                 {
-                    this->addPossibleMove({4, currPosition.second});
+                    this->addPossibleMove({3, currPosition.second});
                     enpassant = true;
                 }
             }
@@ -34,14 +47,14 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                     addPossibleMove({currPosition.first + 1, currPosition.second + 1});
                     addPossibleCapture({currPosition.first + 1, currPosition.second + 1});
                 }
-                if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second + 1})))
-                {
-                    if (p->ISenpassant())
-                    {
-                        addPossibleMove({currPosition.first + 1, currPosition.second + 1});
-                        addPossibleCapture({currPosition.first + 1, currPosition.second + 1});
-                    } // en passant , Capturable Diagonally to the right
-                }
+                // if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second + 1})))
+                // {
+                //     if (p->ISenpassant())
+                //     {
+                //         addPossibleMove({currPosition.first + 1, currPosition.second + 1});
+                //         addPossibleCapture({currPosition.first + 1, currPosition.second + 1});
+                //     } // en passant , Capturable Diagonally to the right
+                // }
             }
 
             if (currPosition.second - 1 < 8 && (Board.getAt({currPosition.first + 1, currPosition.second - 1}) != nullptr))
@@ -52,14 +65,14 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                     addPossibleMove({currPosition.first + 1, currPosition.second -1});
                     addPossibleCapture({currPosition.first + 1, currPosition.second - 1});
                 }
-                if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second - 1})))
-                {
-                    if (p->ISenpassant())
-                    {
-                    } // en passant , Capturable Diagonally to the left
-                    addPossibleMove({currPosition.first + 1, currPosition.second -1});
-                    addPossibleCapture({currPosition.first + 1, currPosition.second - 1});
-                }
+                // if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second - 1})))
+                // {
+                //     if (p->ISenpassant())
+                //     {
+                //     } // en passant , Capturable Diagonally to the left
+                //     addPossibleMove({currPosition.first + 1, currPosition.second -1});
+                //     addPossibleCapture({currPosition.first + 1, currPosition.second - 1});
+                // }
             }
         }
     }
@@ -71,13 +84,13 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
             {
                 // Check promotion !!
             }
-            if (currPosition.first == 7)
+            if (currPosition.first == 6)
             {
-                if (Board.getAt({6, currPosition.second}) == nullptr)
-                    this->addPossibleMove({6, currPosition.second});
                 if (Board.getAt({5, currPosition.second}) == nullptr)
-                {
                     this->addPossibleMove({5, currPosition.second});
+                if (Board.getAt({4, currPosition.second}) == nullptr)
+                {
+                    this->addPossibleMove({4, currPosition.second});
                     enpassant = true;
                 }
             }
@@ -87,42 +100,42 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
             }
             if (currPosition.second + 1 < 8 && (Board.getAt({currPosition.first - 1, currPosition.second + 1}) != nullptr))
             {
-                if (!Board.getAt({currPosition.first - 1, currPosition.second + 1})->isWhite())
+                if (Board.getAt({currPosition.first - 1, currPosition.second + 1})->isWhite())
                 {
                     // Capturable Diagonally to the left
 
                     addPossibleMove({currPosition.first - 1, currPosition.second +1});
                     addPossibleCapture({currPosition.first - 1, currPosition.second + 1});
                 }
-                if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second + 1})))
-                {
-                    if (p->ISenpassant())
-                    {
-                    } // en passant , Capturable Diagonally to the left
+                // if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second + 1})))
+                // {
+                //     if (p->ISenpassant())
+                //     {
+                //     } // en passant , Capturable Diagonally to the left
 
-                    addPossibleMove({currPosition.first - 1, currPosition.second +1});
-                    addPossibleCapture({currPosition.first - 1, currPosition.second +1});
-                }
+                //     addPossibleMove({currPosition.first - 1, currPosition.second +1});
+                //     addPossibleCapture({currPosition.first - 1, currPosition.second +1});
+                // }
             }
 
             if (currPosition.second - 1 < 8 && (Board.getAt({currPosition.first - 1, currPosition.second - 1}) != nullptr))
             {
-                if (!Board.getAt({currPosition.first - 1, currPosition.second - 1})->isWhite())
+                if (Board.getAt({currPosition.first - 1, currPosition.second - 1})->isWhite())
                 {
                     // Capturable Diagonally to the left
 
                     addPossibleMove({currPosition.first - 1, currPosition.second -1});
                     addPossibleCapture({currPosition.first - 1, currPosition.second - 1});
                 }
-                if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second - 1})))
-                {
-                    if (p->ISenpassant())
-                    {
+                // if (pawn *p = dynamic_cast<pawn *>(Board.getAt({currPosition.first, currPosition.second - 1})))
+                // {
+                //     if (p->ISenpassant())
+                //     {
 
-                    addPossibleMove({currPosition.first - 1, currPosition.second -1});
-                    addPossibleCapture({currPosition.first - 1, currPosition.second - 1});
-                    } // en passant , Capturable Diagonally to the left
-                }
+                //     addPossibleMove({currPosition.first - 1, currPosition.second -1});
+                //     addPossibleCapture({currPosition.first - 1, currPosition.second - 1});
+                //     } // en passant , Capturable Diagonally to the left
+                // }
             }
         }
     }

@@ -1,5 +1,5 @@
 #include "piece.h"
-
+#include "board.h"
 king::king(bool isWhite, pair<int, int> startingPosition)
     : piece(isWhite, startingPosition)
 {
@@ -8,9 +8,9 @@ king::king(bool isWhite, pair<int, int> startingPosition)
     canCastle = true;
 }
 
-bool king:: IsCheck (board &Board,pair<int,int> currPosition)
-{
-    //Needs to see if there is a piece that has a possible move to that square, if so the king can't move to that square
+// bool king:: IsCheck (board &Board,pair<int,int> currPosition)
+// {
+//     //Needs to see if there is a piece that has a possible move to that square, if so the king can't move to that square
 
-    return false; // Placeholder for actual check logic
-}
+//     return false; // Placeholder for actual check logic
+// }

@@ -1,6 +1,7 @@
 #pragma once
 #include <bits/stdc++.h>
-#include "piece.h"
+#include "pieces/piece.h"
+#include "board.h"
 using namespace std;
 
 class player
@@ -26,21 +27,3 @@ public:
     ~player();
 
 };
-
-void player :: addMove (pair<pair<piece*,string>,bool> move){
-    moves.push(move);
-}
-
-void player:: addCapture (pair<piece*,string> capture)
-{
-    captured.push(capture);
-}
-player::player(bool isWhite)
-{
-    this->White=isWhite;
-}
-
-
-player::~player()
-{
-}
