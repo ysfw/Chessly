@@ -1,5 +1,5 @@
 #include "piece.h"
-#include "board.h"
+#include "game.h"
 rook::rook(bool isWhite, pair<size_t, size_t> startingPosition)
     : piece(isWhite, startingPosition)
 {

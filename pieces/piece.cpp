@@ -1,7 +1,5 @@
 #include "piece.h"
-#include "player.h"
-#include "helpers.h"
-#include "board.h"
+#include "game.h"
 
 bool piece::isWhite(){return White;}
 set<pair<size_t,size_t>> piece :: getPossibleMoves () {return possibleMoves;};

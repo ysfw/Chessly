@@ -1,5 +1,5 @@
 #include "piece.h"
-#include "board.h"
+#include "game.h"
 king::king(bool isWhite, pair<int, int> startingPosition)
     : piece(isWhite, startingPosition)
 {
