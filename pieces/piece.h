@@ -3,6 +3,7 @@
 using namespace std;
 class player;
 class board;
+class game;
 
 class piece
 {
@@ -79,15 +80,11 @@ class pawn : public piece
     bool enpassant = false;
     
     public:
+    bool ISenpassant();
+    void setenpassant();
+    void resetenpassant();
     pawn(bool isWhite,pair<size_t,size_t> startingPosition);
     void checkMoves(board &Board,pair<size_t,size_t> currPosition)override;
-    bool ISenpassant();
-    // void resetenpassant(){enpassant=false;};
-
-    /*this piece of horrible code should be in game logic because you obviously
-    need to reset after each move but rn you can only reset if the piece
-    moved in the turn to make an en passant is a pawn and that's totally incorrect
-     */
 };
 
 

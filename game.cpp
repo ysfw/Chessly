@@ -66,6 +66,17 @@ void board :: setAt(pair<size_t,size_t> position,piece* Pointer2piece){
     Board[position.first][position.second] = Pointer2piece;
 }
 
+bool board :: isEnpassant () {
+    return enpassant;
+}
+
+void board :: setEnpassant () {
+    enpassant = true;
+}
+
+void board :: resetEnpassant() {
+    enpassant = false;
+}
 
 void board :: printBoardB (){
     for (size_t i = 0; i < 8; i++)

@@ -14,10 +14,18 @@ private:
     vector<vector<piece*>> Board;
     map<string,piece*> whitePieces;
     map<string,piece*> blackPieces;
+    bool enpassant = false , check = false , 
+    checkmate = false , stalemate = false ;
 public:
     board();
     vector<pair<unsigned int,unsigned int>> AttackedBy(pair<size_t,size_t> position); 
     //returns a vector containing positions of pieces attacking a given square
+    bool isEnpassant ();
+    void setEnpassant();
+    void resetEnpassant();
+    bool isMate ();
+    bool isStalemate ();
+    bool isTrifoldDraw ();
 
     void setAt(pair<size_t,size_t> position,piece* Pointer2piece);
     piece* getAt(pair<size_t,size_t> position);
@@ -52,12 +60,8 @@ public:
 
 class Normalgame
 {
-private:
-    bool enpassant = false , check = false , 
-    checkmate = false , stalemate = false ;
-    
 public:
-    Normalgame(/* args */);
+    Normalgame();
     void run (); 
     ~Normalgame();
 };
