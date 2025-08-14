@@ -42,18 +42,24 @@ void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
         }
     if (secondCoord < 8 && firstCoord<8)
     {
-        if ((Board.getAt({firstCoord,secondCoord}) == nullptr))
+        if ((Board.getAt({firstCoord,secondCoord}) != nullptr && Board.getAt({firstCoord,secondCoord})->isWhite() == this->isWhite()))
         {
-            addPossibleMove({firstCoord,secondCoord});
+            break;
         }
         else
         {
-            if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite()){
-            //capturable
-            addPossibleMove({firstCoord,secondCoord});
-            addPossibleCapture({firstCoord,secondCoord});
+            
+            board tempBoard = Board; 
+            tempBoard.setAt({firstCoord,secondCoord},this);
+            tempBoard.setAt(this->getPosition(),nullptr); 
+
+            if (tempBoard.AttackedBy(tempBoard.getKingPosition(this->isWhite()), this->isWhite()).empty()) {
+                addPossibleMove({firstCoord,secondCoord});
+                if (Board.getAt({firstCoord,secondCoord}) != nullptr) {
+                    addPossibleCapture({firstCoord,secondCoord});
+                    break;
+                }
             }
-            break;
         }
         
     }

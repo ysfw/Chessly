@@ -16,19 +16,23 @@ void Knight ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
         int secondCoord = (int)this->getPosition().second + direction.second;
         if((firstCoord <8 &&firstCoord >= 0 && secondCoord < 8  && secondCoord >=0))
         {
-            if (Board.getAt({firstCoord,secondCoord}) == nullptr)
-                {
-                    addPossibleMove({firstCoord,secondCoord});
+            pair<size_t, size_t> targetSquare = {(size_t)firstCoord, (size_t)secondCoord};
+            piece* pieceOnTarget = Board.getAt(targetSquare);
+
+            if (pieceOnTarget != nullptr && pieceOnTarget->isWhite() == this->isWhite()) {
+                continue;
+            }
+
+            board tempBoard = Board; 
+            tempBoard.setAt(targetSquare,this);
+            tempBoard.setAt(this->getPosition(),nullptr); 
+
+            if (tempBoard.AttackedBy(tempBoard.getKingPosition(this->isWhite()), this->isWhite()).empty()) {
+                addPossibleMove(targetSquare);
+                if (pieceOnTarget != nullptr) {
+                    addPossibleCapture(targetSquare);
                 }
-                else
-                {
-                    if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({firstCoord,secondCoord});
-                        addPossibleCapture({firstCoord,secondCoord});
-                    }
-                }
+            }
         }
     }
    

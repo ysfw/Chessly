@@ -161,58 +161,45 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                     for (int direction = 1; direction < 5; direction++)
                     {
                         possiblePath.clear();
+                        
                         for (size_t k = 1; k < 8; k++)
                         {
                             size_t firstCoord, secondCoord;
 
                             switch (direction)
                             {
-                            case 1:
-                                firstCoord = R->getPosition().first;
-                                secondCoord = R->getPosition().second + i;
-                                break;
-
-                            case 2:
-                                firstCoord = R->getPosition().first;
-                                secondCoord = R->getPosition().second - i;
-                                break;
-
-                            case 3:
-                                firstCoord = R->getPosition().first + i;
-                                secondCoord = R->getPosition().second;
-                                break;
-
-                            case 4:
-                                firstCoord = R->getPosition().first - i;
-                                secondCoord = R->getPosition().second;
-                                break;
-
-                            default:
-                                break;
+                            case 1: firstCoord = i; secondCoord = j + k; break;
+                            case 2: firstCoord = i; secondCoord = j - k; break;
+                            case 3: firstCoord = i + k; secondCoord = j; break;
+                            case 4: firstCoord = i - k; secondCoord = j; break;
                             }
+
+
                             if (secondCoord < 8 && firstCoord < 8)
                             {
-                                if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
-                                    possiblePath.insert({firstCoord, secondCoord});
+                    
+                                    currAttk.attacker = R;
+                                    currAttk.path = possiblePath;
+                                    result.push_back(currAttk);
+                                    break;
                                 }
                                 else
-                                {
-                                    if (firstCoord == Position.first && secondCoord == Position.second)
+                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
-                                        currAttk.attacker = R;
-                                        currAttk.path = possiblePath;
-                                        result.push_back(currAttk);
+                                        possiblePath.insert({firstCoord, secondCoord});
+                                        
                                     }
                                     else
                                     {
-                                        possiblePath.clear();
-                                    }
-                                    break;
-                                }
+                                        possiblePath.clear();    
+                                        break;
+                                    }}
                             }
-                            else
-                                break;
+                            else{
+
+                                break;}
                         }
                     }
                 }
@@ -228,23 +215,23 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 switch (direction)
                                 {
                                 case 1: // Right Diagonal Up
-                                    firstCoord = B->getPosition().first + i;
-                                    secondCoord = B->getPosition().second + i;
+                                    firstCoord = B->getPosition().first + k;
+                                    secondCoord = B->getPosition().second + k;
                                     break;
 
                                 case 2: // Left Diagonal Down
-                                    firstCoord = B->getPosition().first + i;
-                                    secondCoord = B->getPosition().second - i;
+                                    firstCoord = B->getPosition().first + k;
+                                    secondCoord = B->getPosition().second - k;
                                     break;
 
                                 case 3: // Right Diagonal Down
-                                    firstCoord = B->getPosition().first - i;
-                                    secondCoord = B->getPosition().second + i;
+                                    firstCoord = B->getPosition().first - k;
+                                    secondCoord = B->getPosition().second + k;
                                     break;
 
                                 case 4: // left Diagonal Down
-                                    firstCoord = B->getPosition().first - i;
-                                    secondCoord = B->getPosition().second - i;
+                                    firstCoord = B->getPosition().first - k;
+                                    secondCoord = B->getPosition().second - k;
                                     break;
 
                                 default:
@@ -252,24 +239,25 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 }
                                 if (secondCoord < 8 && firstCoord < 8)
                                 {
-                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                    if (firstCoord == Position.first && secondCoord == Position.second)
+                                {
+                    
+                                    currAttk.attacker = B;
+                                    currAttk.path = possiblePath;
+                                    result.push_back(currAttk);
+                                    break;
+                                }
+                                else
+                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
                                         possiblePath.insert({firstCoord, secondCoord});
+                                        
                                     }
                                     else
                                     {
-                                        if (firstCoord == Position.first && secondCoord == Position.second)
-                                        {
-                                            currAttk.attacker = B;
-                                            currAttk.path = possiblePath;
-                                            result.push_back(currAttk);
-                                        }
-                                        else
-                                        {
-                                            possiblePath.clear();
-                                        }
+                                        possiblePath.clear();    
                                         break;
-                                    }
+                                    }}
                                 }
                                 else
                                     break;
@@ -291,21 +279,21 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                             {
                             case 1:
                                 firstCoord = Q->getPosition().first;
-                                secondCoord = Q->getPosition().second + i;
+                                secondCoord = Q->getPosition().second + k;
                                 break;
 
                             case 2:
                                 firstCoord = Q->getPosition().first;
-                                secondCoord = Q->getPosition().second - i;
+                                secondCoord = Q->getPosition().second - k;
                                 break;
 
                             case 3:
-                                firstCoord = Q->getPosition().first + i;
+                                firstCoord = Q->getPosition().first + k;
                                 secondCoord = Q->getPosition().second;
                                 break;
 
                             case 4:
-                                firstCoord = Q->getPosition().first - i;
+                                firstCoord = Q->getPosition().first - k;
                                 secondCoord = Q->getPosition().second;
                                 break;
 
@@ -314,24 +302,25 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                             }
                             if (secondCoord < 8 && firstCoord < 8)
                             {
-                                if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
-                                    possiblePath.insert({firstCoord, secondCoord});
+                    
+                                    currAttk.attacker = Q;
+                                    currAttk.path = possiblePath;
+                                    result.push_back(currAttk);
+                                    break;
                                 }
                                 else
-                                {
-                                    if (firstCoord == Position.first && secondCoord == Position.second)
+                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
-                                        currAttk.attacker = Q;
-                                        currAttk.path = possiblePath;
-                                        result.push_back(currAttk);
+                                        possiblePath.insert({firstCoord, secondCoord});
+                                        
                                     }
                                     else
                                     {
-                                        possiblePath.clear();
-                                    }
-                                    break;
-                                }
+                                        possiblePath.clear();    
+                                        break;
+                                    }}
                             }
                             else
                                 break;
@@ -347,23 +336,23 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 switch (direction)
                                 {
                                 case 1: // Right Diagonal Up
-                                    firstCoord = Q->getPosition().first + i;
-                                    secondCoord = Q->getPosition().second + i;
+                                    firstCoord = Q->getPosition().first + k;
+                                    secondCoord = Q->getPosition().second + k;
                                     break;
 
                                 case 2: // Left Diagonal Down
-                                    firstCoord = Q->getPosition().first + i;
-                                    secondCoord = Q->getPosition().second - i;
+                                    firstCoord = Q->getPosition().first + k;
+                                    secondCoord = Q->getPosition().second - k;
                                     break;
 
                                 case 3: // Right Diagonal Down
-                                    firstCoord = Q->getPosition().first - i;
-                                    secondCoord = Q->getPosition().second + i;
+                                    firstCoord = Q->getPosition().first - k;
+                                    secondCoord = Q->getPosition().second + k;
                                     break;
 
                                 case 4: // left Diagonal Down
-                                    firstCoord = Q->getPosition().first - i;
-                                    secondCoord = Q->getPosition().second - i;
+                                    firstCoord = Q->getPosition().first - k;
+                                    secondCoord = Q->getPosition().second - k;
                                     break;
 
                                 default:
@@ -371,24 +360,25 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 }
                                 if (secondCoord < 8 && firstCoord < 8)
                                 {
-                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                    if (firstCoord == Position.first && secondCoord == Position.second)
+                                {
+                    
+                                    currAttk.attacker = Q;
+                                    currAttk.path = possiblePath;
+                                    result.push_back(currAttk);
+                                    break;
+                                }
+                                else
+                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
                                         possiblePath.insert({firstCoord, secondCoord});
+                                        
                                     }
                                     else
                                     {
-                                        if (firstCoord == Position.first && secondCoord == Position.second)
-                                        {
-                                            currAttk.attacker = Q;
-                                            currAttk.path = possiblePath;
-                                            result.push_back(currAttk);
-                                        }
-                                        else
-                                        {
-                                            possiblePath.clear();
-                                        }
+                                        possiblePath.clear();    
                                         break;
-                                    }
+                                    }}
                                 }
                                 else
                                     break;
