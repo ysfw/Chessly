@@ -9,7 +9,7 @@ bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
 void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
 {
     clearMoves();
-    for (size_t direction = 1; direction < 5; direction++)
+    for (size_t direction = 1; direction < 5; direction++){
     {
         for (size_t i=1;i < 8; i++)
         {
@@ -61,4 +61,5 @@ void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
 }      
     }
     
+}
 }

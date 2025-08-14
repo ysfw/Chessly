@@ -8,21 +8,33 @@ pair<size_t,size_t> stringTOmove(string move);
 void clearScreen();
 
 
+struct AttackInfo {
+    piece* attacker; // A pointer to the piece delivering the attack
+    set<pair<size_t,size_t>> path; // The squares between the attacker and a given square.
+    // This will be EMPTY for direct attackers like knights and pawns.
+};
+
 class board
 {
 private:
     vector<vector<piece*>> Board;
     map<string,piece*> whitePieces;
     map<string,piece*> blackPieces;
+    pair<size_t,size_t> whiteKingPosition;
+    pair<size_t,size_t> blackKingPosition;
     bool enpassant = false , check = false , 
     checkmate = false , stalemate = false ;
 public:
     board();
-    vector<pair<unsigned int,unsigned int>> AttackedBy(pair<size_t,size_t> position); 
-    //returns a vector containing positions of pieces attacking a given square
+    vector<AttackInfo> AttackedBy(pair<size_t,size_t> Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
+    void setKingPosition(bool isWhite, pair<size_t,size_t> newPosition);
+    pair<size_t,size_t> getKingPosition(bool isWhite);
     bool isEnpassant ();
     void setEnpassant();
     void resetEnpassant();
+    bool isCheck();
+    void setCheck();
+    void resetCheck();
     bool isMate ();
     bool isStalemate ();
     bool isTrifoldDraw ();

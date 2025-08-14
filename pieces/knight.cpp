@@ -10,155 +10,26 @@ Knight::Knight(bool isWhite, pair<size_t, size_t> startingPosition)
 void Knight ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
 {
     clearMoves();
-    for (int direction = 1; direction < 5; direction++){
-        switch (direction)
+    pair<int,int> directions [8]  = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{-1,2},{1,-2},{-1,-2}};
+    for(pair<int,int> direction : directions){
+        int firstCoord =(int)this->getPosition().first + direction.first;
+        int secondCoord = (int)this->getPosition().second + direction.second;
+        if((firstCoord <8 &&firstCoord >= 0 && secondCoord < 8  && secondCoord >=0))
         {
-        case 1:
-            if ((currPosition.first + 1 < 8 && currPosition.second + 2 < 8))
-            {
-                if (Board.getAt({currPosition.first + 1, currPosition.second + 2}) == nullptr)
+            if (Board.getAt({firstCoord,secondCoord}) == nullptr)
                 {
-                    addPossibleMove({currPosition.first + 1, currPosition.second + 2});
+                    addPossibleMove({firstCoord,secondCoord});
                 }
                 else
                 {
-                    if (Board.getAt({currPosition.first + 1, currPosition.second + 2})->isWhite() != this->isWhite())
+                    if (Board.getAt({firstCoord,secondCoord})->isWhite() != this->isWhite())
                     {
                         // capturable
-                        addPossibleMove({currPosition.first + 1, currPosition.second + 2});
-                        addPossibleCapture({currPosition.first + 1, currPosition.second + 2});
+                        addPossibleMove({firstCoord,secondCoord});
+                        addPossibleCapture({firstCoord,secondCoord});
                     }
                 }
-            }
-
-            if ((currPosition.first - 1 < 8 && currPosition.second + 2 < 8))
-            {
-                if (Board.getAt({currPosition.first - 1, currPosition.second + 2}) == nullptr)
-                {
-                    addPossibleMove({currPosition.first - 1, currPosition.second + 2});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first - 1, currPosition.second + 2})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first - 1, currPosition.second + 2});
-                        addPossibleCapture({currPosition.first - 1, currPosition.second + 2});
-                    }
-                }
-            }
-            break;
-
-        case 2:
-            if ((currPosition.first + 1 < 8 && currPosition.second - 2 < 8))
-            {
-                if ((Board.getAt({currPosition.first + 1, currPosition.second - 2}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first + 1, currPosition.second - 2});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first + 1, currPosition.second - 2})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first + 1, currPosition.second - 2});
-                        addPossibleCapture({currPosition.first + 1, currPosition.second - 2});
-                    }
-                }
-            }
-
-            if ((currPosition.first - 1 < 8 && currPosition.second - 2 < 8))
-            {
-                if ((Board.getAt({currPosition.first - 1, currPosition.second - 2}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first - 1, currPosition.second - 2});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first - 1, currPosition.second - 2})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first - 1, currPosition.second - 2});
-                        addPossibleCapture({currPosition.first - 1, currPosition.second - 2});
-                    }
-                }
-            }
-            break;
-
-        case 3:
-            if (currPosition.first + 2 < 8 && currPosition.second + 1 < 8)
-            {
-                if ((Board.getAt({currPosition.first + 2, currPosition.second + 1}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first + 2, currPosition.second + 1});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first + 2, currPosition.second + 1})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first + 2, currPosition.second + 1});
-                        addPossibleCapture({currPosition.first + 2, currPosition.second + 1});
-                    }
-                }
-            }
-
-            if (currPosition.first + 2 < 8 && currPosition.second - 1 < 8)
-            {
-                if ((Board.getAt({currPosition.first + 2, currPosition.second - 1}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first + 2, currPosition.second - 1});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first + 2, currPosition.second - 1})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first + 2, currPosition.second - 1});
-                        addPossibleCapture({currPosition.first + 2, currPosition.second - 1});
-                    }
-                }
-            }
-            break;
-
-        case 4:
-            if (currPosition.first - 2 < 8 && currPosition.second + 1 < 8)
-            {
-                if ((Board.getAt({currPosition.first - 2, currPosition.second + 1}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first - 2, currPosition.second + 1});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first - 2, currPosition.second + 1})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first - 2, currPosition.second + 1});
-                        addPossibleCapture({currPosition.first - 2, currPosition.second + 1});
-                    }
-                }
-            }
-
-            if (currPosition.first - 2 < 8 && currPosition.second - 1 < 8)
-            {
-                if ((Board.getAt({currPosition.first - 2, currPosition.second - 1}) == nullptr))
-                {
-                    addPossibleMove({currPosition.first - 2, currPosition.second - 1});
-                }
-                else
-                {
-                    if (Board.getAt({currPosition.first - 2, currPosition.second - 1})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({currPosition.first - 2, currPosition.second - 1});
-                        addPossibleCapture({currPosition.first - 2, currPosition.second - 1});
-                    }
-                }
-            }
-            break;
-
-        default:
-            break;
         }
-}
+    }
+   
 }

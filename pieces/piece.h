@@ -35,9 +35,9 @@ public:
 
 
 class rook : public piece {
-    private:
+private:
     bool canCastle;
-   public:
+public:
    rook(bool White, pair<size_t, size_t> startingPosition);
    bool checkRookCastle();
    void checkMoves(board &Board, pair<size_t, size_t> currPos)override;
@@ -46,7 +46,7 @@ class rook : public piece {
 
 class bishop : public piece
 {
-    public:
+public:
     bishop(bool isWhite, pair<size_t,size_t> startingPosition);
     void checkMoves(board &Board, pair<size_t,size_t> currPosition)override;
 };
@@ -54,14 +54,11 @@ class bishop : public piece
 
 class king : public piece
 {
-    private:
-    bool inCheck;    
+private: 
     bool canCastle;
-    bool IsCheck(board &Board,pair<int,int> position);
-    public:
+public:
     king(bool White, pair<int, int> startingPosition);
-    // bool InCheck(){return inCheck;}
-    // void checkMoves(board &Board, pair<size_t, size_t> position)override;
+    void checkMoves(board &Board, pair<size_t, size_t> position)override;
     
 };
 
