@@ -39,7 +39,8 @@ private:
     bool canCastle;
 public:
    rook(bool White, pair<size_t, size_t> startingPosition);
-   bool checkRookCastle();
+   bool canRookCastle();
+   void resetCastling();
    void checkMoves(board &Board, pair<size_t, size_t> currPos)override;
 };
 
@@ -59,7 +60,9 @@ private:
 public:
     king(bool White, pair<int, int> startingPosition);
     void checkMoves(board &Board, pair<size_t, size_t> position)override;
-    
+    bool canKingCastle();
+    void resetCastling();
+    bool isCheck(board &Board,pair<size_t,size_t> targetSquare);
 };
 
 class Knight : public piece

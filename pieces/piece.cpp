@@ -60,8 +60,7 @@ bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
     piece* targetOnNextSquare = Board.getAt(newPosition);
     bool isCapture = (targetOnNextSquare != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn*>(this) && !isCapture && binary_search(this->possibleCaptures.begin(), this->possibleCaptures.end(), newPosition));
-
-
+    
     // --- BRANCH 1: Standard Capture ---
     if (isCapture && !isEnPassantCapture)
     {
@@ -93,7 +92,7 @@ bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
         player->addMove({{this, moveTOstring(position)}, false});
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
-
+        
         if (pawn *p = dynamic_cast<pawn *>(this)) {
             if (abs((int)newPosition.first - (int)position.first) == 2) {
                 Board.setEnpassant();
@@ -104,9 +103,15 @@ bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
         } else {
             Board.resetEnpassant();
         }
-
+        
         this->updatePos(newPosition);
     }
+    
+    
+    //Reseting Castling possibility for rooks and kings as anyways once they make a move (even if that move was castling) castling should reset
+    if(king *k = dynamic_cast<king *>(this)) k->resetCastling();
+    if(rook *r = dynamic_cast<rook *>(this)) r->resetCastling();
 
+    
     return true;
 }

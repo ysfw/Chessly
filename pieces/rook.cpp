@@ -4,12 +4,21 @@ rook::rook(bool isWhite, pair<size_t, size_t> startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♜" : "♖");
+    if((isWhite &&( startingPosition == pair<size_t,size_t>{0,0} || startingPosition == pair<size_t,size_t>{0,7})) 
+    || (!isWhite && (startingPosition == pair<size_t,size_t>{7,7} || startingPosition == pair<size_t,size_t>{7,0})))
     canCastle = true;
+
+    else canCastle = false;
 }
 
-bool rook::checkRookCastle()
+bool rook::canRookCastle()
 {
     return canCastle;
+}
+
+void rook::resetCastling()
+{
+    canCastle = false;
 }
 
 void rook::checkMoves(board &Board, pair<size_t, size_t> currPos)

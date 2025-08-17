@@ -4,7 +4,24 @@ king::king(bool isWhite, pair<int, int> startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♚":"♔");
-    canCastle = true;
+    if((isWhite && startingPosition == pair<int,int>{0,4}) || (!isWhite && startingPosition == pair<int,int>{7,4})) canCastle = true;
+    else canCastle = false;
+}
+
+bool king :: isCheck(board &Board,pair<size_t,size_t> targetSquare){
+    board tempBoard = Board; 
+    tempBoard.setAt(targetSquare,this);
+    tempBoard.setAt(this->getPosition(),nullptr);
+    if(tempBoard.AttackedBy(targetSquare, this->isWhite()).empty()) return false;
+    else return true;
+}
+
+bool king::canKingCastle(){
+    return canCastle;
+}
+
+void king::resetCastling() {
+    canCastle = false;
 }
 
 void king::checkMoves(board &Board, pair<size_t, size_t> position) {
@@ -23,11 +40,7 @@ void king::checkMoves(board &Board, pair<size_t, size_t> position) {
                 continue;
             }
 
-            board tempBoard = Board; 
-            tempBoard.setAt(targetSquare,this);
-            tempBoard.setAt(this->getPosition(),nullptr); 
-
-            if (tempBoard.AttackedBy(targetSquare, this->isWhite()).empty()) {
+            if (!isCheck(Board,targetSquare)) {
                 addPossibleMove(targetSquare);
                 if (pieceOnTarget != nullptr) {
                     addPossibleCapture(targetSquare);
