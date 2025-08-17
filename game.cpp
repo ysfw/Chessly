@@ -161,45 +161,59 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                     for (int direction = 1; direction < 5; direction++)
                     {
                         possiblePath.clear();
-                        
+
                         for (size_t k = 1; k < 8; k++)
                         {
                             size_t firstCoord, secondCoord;
 
                             switch (direction)
                             {
-                            case 1: firstCoord = i; secondCoord = j + k; break;
-                            case 2: firstCoord = i; secondCoord = j - k; break;
-                            case 3: firstCoord = i + k; secondCoord = j; break;
-                            case 4: firstCoord = i - k; secondCoord = j; break;
+                            case 1:
+                                firstCoord = i;
+                                secondCoord = j + k;
+                                break;
+                            case 2:
+                                firstCoord = i;
+                                secondCoord = j - k;
+                                break;
+                            case 3:
+                                firstCoord = i + k;
+                                secondCoord = j;
+                                break;
+                            case 4:
+                                firstCoord = i - k;
+                                secondCoord = j;
+                                break;
                             }
-
 
                             if (secondCoord < 8 && firstCoord < 8)
                             {
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
-                    
+
                                     currAttk.attacker = R;
                                     currAttk.path = possiblePath;
                                     result.push_back(currAttk);
                                     break;
                                 }
                                 else
-                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                {
+                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
                                         possiblePath.insert({firstCoord, secondCoord});
-                                        
                                     }
                                     else
                                     {
-                                        possiblePath.clear();    
+                                        possiblePath.clear();
                                         break;
-                                    }}
+                                    }
+                                }
                             }
-                            else{
+                            else
+                            {
 
-                                break;}
+                                break;
+                            }
                         }
                     }
                 }
@@ -240,24 +254,25 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 if (secondCoord < 8 && firstCoord < 8)
                                 {
                                     if (firstCoord == Position.first && secondCoord == Position.second)
-                                {
-                    
-                                    currAttk.attacker = B;
-                                    currAttk.path = possiblePath;
-                                    result.push_back(currAttk);
-                                    break;
-                                }
-                                else
-                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
-                                        possiblePath.insert({firstCoord, secondCoord});
-                                        
+
+                                        currAttk.attacker = B;
+                                        currAttk.path = possiblePath;
+                                        result.push_back(currAttk);
+                                        break;
                                     }
                                     else
                                     {
-                                        possiblePath.clear();    
-                                        break;
-                                    }}
+                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                        {
+                                            possiblePath.insert({firstCoord, secondCoord});
+                                        }
+                                        else
+                                        {
+                                            possiblePath.clear();
+                                            break;
+                                        }
+                                    }
                                 }
                                 else
                                     break;
@@ -304,23 +319,24 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                             {
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
-                    
+
                                     currAttk.attacker = Q;
                                     currAttk.path = possiblePath;
                                     result.push_back(currAttk);
                                     break;
                                 }
                                 else
-                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                {
+                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
                                         possiblePath.insert({firstCoord, secondCoord});
-                                        
                                     }
                                     else
                                     {
-                                        possiblePath.clear();    
+                                        possiblePath.clear();
                                         break;
-                                    }}
+                                    }
+                                }
                             }
                             else
                                 break;
@@ -361,24 +377,25 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
                                 if (secondCoord < 8 && firstCoord < 8)
                                 {
                                     if (firstCoord == Position.first && secondCoord == Position.second)
-                                {
-                    
-                                    currAttk.attacker = Q;
-                                    currAttk.path = possiblePath;
-                                    result.push_back(currAttk);
-                                    break;
-                                }
-                                else
-                                {    if (this->getAt({firstCoord, secondCoord}) == nullptr)
                                     {
-                                        possiblePath.insert({firstCoord, secondCoord});
-                                        
+
+                                        currAttk.attacker = Q;
+                                        currAttk.path = possiblePath;
+                                        result.push_back(currAttk);
+                                        break;
                                     }
                                     else
                                     {
-                                        possiblePath.clear();    
-                                        break;
-                                    }}
+                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                        {
+                                            possiblePath.insert({firstCoord, secondCoord});
+                                        }
+                                        else
+                                        {
+                                            possiblePath.clear();
+                                            break;
+                                        }
+                                    }
                                 }
                                 else
                                     break;
@@ -404,154 +421,178 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
             }
         }
     }
-            return result;
+    return result;
+}
+
+bool board ::isPinned(piece *piece, pair<size_t, size_t> newPosition)
+{
+    board tempBoard = *this;
+    size_t firstCoord = newPosition.first, secondCoord = newPosition.second;
+    
+    set<pair<size_t, size_t>> possibleCaptures = piece->getPossibleCaptures();
+    bool isCapture = (tempBoard.getAt(newPosition) != nullptr);
+    bool isEnPassantCapture = (dynamic_cast<pawn *>(piece) && !isCapture && binary_search(possibleCaptures.begin(), possibleCaptures.end(), newPosition));
+    tempBoard.setAt({firstCoord, secondCoord}, piece);
+    tempBoard.setAt(piece->getPosition(), nullptr);
+    
+    if (isEnPassantCapture)
+    {
+        int capturedPawnRow = piece->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
+        pair<size_t, size_t> capturedPawnPos = {(size_t)capturedPawnRow, newPosition.second};
+        tempBoard.setAt(capturedPawnPos, nullptr);
+    }
+
+    if (tempBoard.AttackedBy(tempBoard.getKingPosition(piece->isWhite()), piece->isWhite()).empty())
+        return false;
+    else
+        return true;
+}
+
+void board ::printBoardB()
+{
+    for (size_t i = 0; i < 8; i++)
+    {
+        cout << i + 1 << ' ';
+        for (int j = 7; j >= 0; j--)
+        {
+            if (Board[i][j] == nullptr)
+                (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
+            else
+                cout << Board[i][j]->getValue() << ' ';
+        }
+        cout << '\n';
+    }
+    cout << "  ";
+    for (size_t i = 0; i < 8; i++)
+        cout << static_cast<char>('h' - i) << ' ';
+    cout << '\n';
+}
+
+void board ::printBoardW()
+{
+    for (int i = 7; i >= 0; i--)
+    {
+        cout << i + 1 << ' ';
+        for (size_t j = 0; j < 8; j++)
+        {
+            if (Board[i][j] == nullptr)
+                (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
+            else
+                cout << Board[i][j]->getValue() << ' ';
+        }
+        cout << '\n';
+    }
+    cout << "  ";
+    for (size_t i = 0; i < 8; i++)
+        cout << static_cast<char>('a' + i) << ' ';
+    cout << '\n';
+}
+
+void player ::addMove(pair<pair<piece *, string>, bool> move)
+{
+    moves.push(move);
+}
+
+void player::addCapture(pair<piece *, string> capture)
+{
+    captured.push(capture);
+}
+player::player(bool isWhite)
+{
+    this->White = isWhite;
+}
+
+player::~player()
+{
+}
+
+Normalgame::Normalgame(/* args */)
+{
+}
+
+Normalgame::~Normalgame()
+{
+}
+
+void Normalgame ::run()
+{
+    board board;
+    player White = player(true);
+    player Black = player(false);
+    bool whiteTurn = true;
+    regex e("^[a-hA-H][1-8]$");
+    while (true)
+    {
+        clearScreen();
+        whiteTurn ? board.printBoardW() : board.printBoardB();
+        string input;
+        cout << "Select a piece (e.g., e2 e4) or type exit: ";
+        cin >> input;
+        transform(input.begin(), input.end(), input.begin(), ::tolower);
+        if (input == "exit")
+        {
+            cout << "Exiting the game." << endl;
+            return;
         }
 
-        void board ::printBoardB()
+        else if (regex_match(input, e))
         {
-            for (size_t i = 0; i < 8; i++)
+            pair<size_t, size_t> position = stringTOmove(input);
+            piece *selected = board.getAt(position);
+            if (selected == nullptr || whiteTurn != selected->isWhite())
             {
-                cout << i + 1 << ' ';
-                for (int j = 7; j >= 0; j--)
-                {
-                    if (Board[i][j] == nullptr)
-                        (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
-                    else
-                        cout << Board[i][j]->getValue() << ' ';
-                }
-                cout << '\n';
+                cout << "Illegal move" << endl;
+                this_thread::sleep_for(std::chrono::seconds(2));
+                continue;
             }
-            cout << "  ";
-            for (size_t i = 0; i < 8; i++)
-                cout << static_cast<char>('h' - i) << ' ';
-            cout << '\n';
-        }
 
-        void board ::printBoardW()
-        {
-            for (int i = 7; i >= 0; i--)
+            clearScreen();
+            whiteTurn ? board.printBoardW() : board.printBoardB();
+            selected->checkMoves(board, position);
+            set<pair<size_t, size_t>> moves = selected->getPossibleMoves();
+            set<pair<size_t, size_t>> captures = selected->getPossibleCaptures();
+            if (moves.empty())
             {
-                cout << i + 1 << ' ';
-                for (size_t j = 0; j < 8; j++)
-                {
-                    if (Board[i][j] == nullptr)
-                        (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
-                    else
-                        cout << Board[i][j]->getValue() << ' ';
-                }
-                cout << '\n';
+                cout << "No possible moves" << endl;
+                this_thread::sleep_for(std::chrono::seconds(2));
+                continue;
             }
-            cout << "  ";
-            for (size_t i = 0; i < 8; i++)
-                cout << static_cast<char>('a' + i) << ' ';
-            cout << '\n';
-        }
-
-        void player ::addMove(pair<pair<piece *, string>, bool> move)
-        {
-            moves.push(move);
-        }
-
-        void player::addCapture(pair<piece *, string> capture)
-        {
-            captured.push(capture);
-        }
-        player::player(bool isWhite)
-        {
-            this->White = isWhite;
-        }
-
-        player::~player()
-        {
-        }
-
-        Normalgame::Normalgame(/* args */)
-        {
-        }
-
-        Normalgame::~Normalgame()
-        {
-        }
-
-        void Normalgame ::run()
-        {
-            board board;
-            player White = player(true);
-            player Black = player(false);
-            bool whiteTurn = true;
-            regex e("^[a-hA-H][1-8]$");
-            while (true)
+            cout << "Possible moves (Red is capturable): ";
+            for (pair<size_t, size_t> move : moves)
             {
-                clearScreen();
-                whiteTurn ? board.printBoardW() : board.printBoardB();
-                string input;
-                cout << "Select a piece (e.g., e2 e4) or type exit: ";
-                cin >> input;
-                transform(input.begin(), input.end(), input.begin(), ::tolower);
-                if (input == "exit")
+                string moveString = moveTOstring(move);
+                if (binary_search(captures.begin(), captures.end(), move))
                 {
-                    cout << "Exiting the game." << endl;
-                    return;
+                    moveString = "\x1b[31m" + moveString + "\x1b[0m";
                 }
-
-                else if (regex_match(input, e))
+                cout << moveString << "  ";
+            }
+            cout << endl;
+            cout << "Play a move or type \"back\" to select another piece : ";
+            cin >> input;
+            transform(input.begin(), input.end(), input.begin(), ::tolower);
+            if (input == "back")
+                continue;
+            else
+            {
+                if (regex_match(input, e) && selected->Move(whiteTurn ? &White : &Black, board, stringTOmove(input)))
                 {
-                    pair<size_t, size_t> position = stringTOmove(input);
-                    piece *selected = board.getAt(position);
-                    if (selected == nullptr || whiteTurn != selected->isWhite())
-                    {
-                        cout << "Illegal move" << endl;
-                        this_thread::sleep_for(std::chrono::seconds(2));
-                        continue;
-                    }
-
-                    clearScreen();
-                    whiteTurn ? board.printBoardW() : board.printBoardB();
-                    selected->checkMoves(board, position);
-                    set<pair<size_t, size_t>> moves = selected->getPossibleMoves();
-                    set<pair<size_t, size_t>> captures = selected->getPossibleCaptures();
-                    if (moves.empty())
-                    {
-                        cout << "No possible moves" << endl;
-                        this_thread::sleep_for(std::chrono::seconds(2));
-                        continue;
-                    }
-                    cout << "Possible moves (Red is capturable): ";
-                    for (pair<size_t, size_t> move : moves)
-                    {
-                        string moveString = moveTOstring(move);
-                        if (binary_search(captures.begin(), captures.end(), move))
-                        {
-                            moveString = "\x1b[31m" + moveString + "\x1b[0m";
-                        }
-                        cout << moveString << "  ";
-                    }
-                    cout << endl;
-                    cout << "Play a move or type \"back\" to select another piece : ";
-                    cin >> input;
-                    transform(input.begin(), input.end(), input.begin(), ::tolower);
-                    if (input == "back")
-                        continue;
-                    else
-                    {
-                        if (regex_match(input, e) && selected->Move(whiteTurn ? &White : &Black, board, stringTOmove(input)))
-                        {
-                            whiteTurn = !whiteTurn;
-                            continue;
-                        }
-                        else
-                        {
-                            cout << "Illegal move" << endl;
-                            this_thread::sleep_for(std::chrono::seconds(2));
-                            continue;
-                        }
-                    }
+                    whiteTurn = !whiteTurn;
+                    continue;
                 }
                 else
                 {
-                    cout << "Invalid position" << endl;
-                    this_thread::sleep_for(chrono::seconds(2));
+                    cout << "Illegal move" << endl;
+                    this_thread::sleep_for(std::chrono::seconds(2));
                     continue;
                 }
             }
         }
+        else
+        {
+            cout << "Invalid position" << endl;
+            this_thread::sleep_for(chrono::seconds(2));
+            continue;
+        }
+    }
+}

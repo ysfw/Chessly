@@ -31,7 +31,7 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
         if (forwardOne < 8 && Board.getAt({(size_t)forwardOne, currPosition.second}) == nullptr)
         {
             addPossibleMove({(size_t)forwardOne, currPosition.second});
-            if (currPosition.first == 1 && Board.getAt({(size_t)forwardTwo, currPosition.second}) == nullptr)
+            if (currPosition.first == 1 && Board.getAt({(size_t)forwardTwo, currPosition.second}) == nullptr &&!Board.isPinned(this,{(size_t)forwardTwo, currPosition.second}))
             {
                 addPossibleMove({(size_t)forwardTwo, currPosition.second});
             }
@@ -39,14 +39,14 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
 
         if (forwardOne < 8 && currPosition.second + 1 < 8) {
             piece* target = Board.getAt({(size_t)forwardOne, currPosition.second + 1});
-            if (target != nullptr && !target->isWhite()) {
+            if (target != nullptr && !target->isWhite() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second + 1})) {
                 addPossibleMove({(size_t)forwardOne, currPosition.second + 1});
                 addPossibleCapture({(size_t)forwardOne, currPosition.second + 1});
             }
         }
-        if (forwardOne < 8 && currPosition.second > 0) {
+        if (forwardOne < 8 && currPosition.second > 0 ) {
             piece* target = Board.getAt({(size_t)forwardOne, currPosition.second - 1});
-            if (target != nullptr && !target->isWhite()) {
+            if (target != nullptr && !target->isWhite() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second - 1})) {
                 addPossibleMove({(size_t)forwardOne, currPosition.second - 1});
                 addPossibleCapture({(size_t)forwardOne, currPosition.second - 1});
             }
@@ -57,7 +57,7 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                 piece* adjacent = Board.getAt({currPosition.first, currPosition.second + 1});
                 if (adjacent != nullptr && !adjacent->isWhite()) {
                     if (pawn* p = dynamic_cast<pawn*>(adjacent)) {
-                        if (p->ISenpassant()) {
+                        if (p->ISenpassant() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second + 1})) {
                             addPossibleMove({(size_t)forwardOne, currPosition.second + 1});
                             addPossibleCapture({(size_t)forwardOne, currPosition.second + 1});
                         }
@@ -68,7 +68,7 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                 piece* adjacent = Board.getAt({currPosition.first, currPosition.second - 1});
                 if (adjacent != nullptr && !adjacent->isWhite()) {
                     if (pawn* p = dynamic_cast<pawn*>(adjacent)) {
-                        if (p->ISenpassant()) {
+                        if (p->ISenpassant() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second - 1})) {
                             addPossibleMove({(size_t)forwardOne, currPosition.second - 1});
                             addPossibleCapture({(size_t)forwardOne, currPosition.second - 1});
                         }
@@ -82,23 +82,23 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
         int forwardOne = currPosition.first - 1;
         int forwardTwo = currPosition.first - 2;
 
-        if (forwardOne >= 0 && Board.getAt({(size_t)forwardOne, currPosition.second}) == nullptr) {
+        if (forwardOne >= 0 && Board.getAt({(size_t)forwardOne, currPosition.second}) == nullptr && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second})) {
             addPossibleMove({(size_t)forwardOne, currPosition.second});
-            if (currPosition.first == 6 && Board.getAt({(size_t)forwardTwo, currPosition.second}) == nullptr) {
+            if (currPosition.first == 6 && Board.getAt({(size_t)forwardTwo, currPosition.second}) == nullptr && !Board.isPinned(this,{(size_t)forwardTwo, currPosition.second}))  {
                 addPossibleMove({(size_t)forwardTwo, currPosition.second});
             }
         }
         
         if (forwardOne >= 0 && currPosition.second + 1 < 8) {
             piece* target = Board.getAt({(size_t)forwardOne, currPosition.second + 1});
-            if (target != nullptr && target->isWhite()) {
+            if (target != nullptr && target->isWhite() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second + 1})) {
                 addPossibleMove({(size_t)forwardOne, currPosition.second + 1});
                 addPossibleCapture({(size_t)forwardOne, currPosition.second + 1});
             }
         }
         if (forwardOne >= 0 && currPosition.second > 0) {
             piece* target = Board.getAt({(size_t)forwardOne, currPosition.second - 1});
-            if (target != nullptr && target->isWhite()) {
+            if (target != nullptr && target->isWhite() && !Board.isPinned(this,{(size_t)forwardOne, currPosition.second - 1})) {
                 addPossibleMove({(size_t)forwardOne, currPosition.second - 1});
                 addPossibleCapture({(size_t)forwardOne, currPosition.second - 1});
             }
@@ -109,7 +109,7 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                 piece* adjacent = Board.getAt({currPosition.first, currPosition.second + 1});
                 if (adjacent != nullptr && adjacent->isWhite()) {
                      if (pawn* p = dynamic_cast<pawn*>(adjacent)) {
-                        if (p->ISenpassant()) {
+                        if (p->ISenpassant()&& !Board.isPinned(this,{(size_t)forwardOne, currPosition.second + 1})) {
                             addPossibleMove({(size_t)forwardOne, currPosition.second + 1});
                             addPossibleCapture({(size_t)forwardOne, currPosition.second + 1});
                         }
@@ -120,7 +120,7 @@ void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                  piece* adjacent = Board.getAt({currPosition.first, currPosition.second - 1});
                 if (adjacent != nullptr && adjacent->isWhite()) {
                      if (pawn* p = dynamic_cast<pawn*>(adjacent)) {
-                        if (p->ISenpassant()) {
+                        if (p->ISenpassant()&& !Board.isPinned(this,{(size_t)forwardOne, currPosition.second - 1})) {
                             addPossibleMove({(size_t)forwardOne, currPosition.second - 1});
                             addPossibleCapture({(size_t)forwardOne, currPosition.second - 1});
                         }

@@ -48,12 +48,7 @@ void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
         }
         else
         {
-            
-            board tempBoard = Board; 
-            tempBoard.setAt({firstCoord,secondCoord},this);
-            tempBoard.setAt(this->getPosition(),nullptr); 
-
-            if (tempBoard.AttackedBy(tempBoard.getKingPosition(this->isWhite()), this->isWhite()).empty()) {
+            if (!Board.isPinned(this,{firstCoord,secondCoord})) {
                 addPossibleMove({firstCoord,secondCoord});
                 if (Board.getAt({firstCoord,secondCoord}) != nullptr) {
                     addPossibleCapture({firstCoord,secondCoord});

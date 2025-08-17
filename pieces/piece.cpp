@@ -4,14 +4,12 @@
 using namespace std;
 
 bool piece::isWhite(){return White;}
-set<pair<size_t,size_t>> piece :: getPossibleMoves () {return possibleMoves;};
-set<pair<size_t,size_t>> piece :: getPossibleCaptures () {return possibleCaptures;};
 
 piece :: piece (bool isWhite, pair<size_t,size_t> startingPosition)
-    : position(startingPosition), White(isWhite), value(""), possibleMoves() {}
+: position(startingPosition), White(isWhite), value(""), possibleMoves() {}
 
 piece::piece()
-    : position({0,0}), White(false), value(""), possibleMoves() {}
+: position({0,0}), White(false), value(""), possibleMoves() {}
 
 pair<size_t,size_t> piece::getPosition()
 {
@@ -41,6 +39,8 @@ void piece:: addPossibleMove(pair<size_t,size_t> move){
 void piece:: addPossibleCapture(pair<size_t,size_t> move){
     possibleCaptures.insert(move);
 }
+set<pair<size_t,size_t>> piece :: getPossibleMoves () {return possibleMoves;};
+set<pair<size_t,size_t>> piece :: getPossibleCaptures () {return possibleCaptures;};
 
 void piece:: clearMoves(){
     possibleMoves.clear();

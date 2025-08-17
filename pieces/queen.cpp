@@ -39,23 +39,24 @@ void queen::checkMoves(board &Board, pair<size_t, size_t> currPosition)
             default:
                 break;
             }
-            if (secondCoord < 8 && firstCoord < 8)
+            if (secondCoord < 8 && firstCoord<8)
+    {
+            if ((Board.getAt({firstCoord,secondCoord}) != nullptr && Board.getAt({firstCoord,secondCoord})->isWhite() == this->isWhite()))
             {
-                if ((Board.getAt({firstCoord, secondCoord}) == nullptr))
-                {
-                    addPossibleMove({firstCoord, secondCoord});
-                }
-                else
-                {
-                    if (Board.getAt({firstCoord, secondCoord})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({firstCoord, secondCoord});
-                        addPossibleCapture({firstCoord, secondCoord});
+                break;
+            }
+            else
+            {
+                if (!Board.isPinned(this,{firstCoord,secondCoord})) {
+                    addPossibleMove({firstCoord,secondCoord});
+                    if (Board.getAt({firstCoord,secondCoord}) != nullptr) {
+                        addPossibleCapture({firstCoord,secondCoord});
+                        break;
                     }
-                    break;
                 }
             }
+            
+        }
             else break;
         }
     }
@@ -91,23 +92,24 @@ void queen::checkMoves(board &Board, pair<size_t, size_t> currPosition)
             default:
                 break;
             }
-            if (secondCoord < 8 && firstCoord < 8)
+            if (secondCoord < 8 && firstCoord<8)
+    {
+            if ((Board.getAt({firstCoord,secondCoord}) != nullptr && Board.getAt({firstCoord,secondCoord})->isWhite() == this->isWhite()))
             {
-                if (Board.getAt({firstCoord, secondCoord}) == nullptr)
-                {
-                    addPossibleMove({firstCoord, secondCoord});
-                }
-                else
-                {
-                    if (Board.getAt({firstCoord, secondCoord})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({firstCoord, secondCoord});
-                        addPossibleCapture({firstCoord, secondCoord});
+                break;
+            }
+            else
+            {
+                if (!Board.isPinned(this,{firstCoord,secondCoord})) {
+                    addPossibleMove({firstCoord,secondCoord});
+                    if (Board.getAt({firstCoord,secondCoord}) != nullptr) {
+                        addPossibleCapture({firstCoord,secondCoord});
+                        break;
                     }
-                    break;
                 }
             }
+            
+        }
             else break;
         }
 }

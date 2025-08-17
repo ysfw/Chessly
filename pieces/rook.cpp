@@ -45,22 +45,23 @@ void rook::checkMoves(board &Board, pair<size_t, size_t> currPos)
             default:
                 break;
             }
-            if (secondCoord < 8 && firstCoord < 8)
+            if (secondCoord < 8 && firstCoord<8)
             {
-                if (Board.getAt({firstCoord, secondCoord}) == nullptr)
+                if ((Board.getAt({firstCoord,secondCoord}) != nullptr && Board.getAt({firstCoord,secondCoord})->isWhite() == this->isWhite()))
                 {
-                    addPossibleMove({firstCoord, secondCoord});
+                    break;
                 }
                 else
                 {
-                    if (Board.getAt({firstCoord, secondCoord})->isWhite() != this->isWhite())
-                    {
-                        // capturable
-                        addPossibleMove({firstCoord, secondCoord});
-                        addPossibleCapture({firstCoord, secondCoord});
+                    if (!Board.isPinned(this,{firstCoord,secondCoord})) {
+                        addPossibleMove({firstCoord,secondCoord});
+                        if (Board.getAt({firstCoord,secondCoord}) != nullptr) {
+                            addPossibleCapture({firstCoord,secondCoord});
+                            break;
+                        }
                     }
-                    break;
                 }
+                
             }
             else break;
         }

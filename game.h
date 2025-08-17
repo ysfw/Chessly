@@ -38,7 +38,7 @@ public:
     bool isMate ();
     bool isStalemate ();
     bool isTrifoldDraw ();
-
+    bool isPinned(piece* piece, pair<size_t,size_t> newPosition);
     void setAt(pair<size_t,size_t> position,piece* Pointer2piece);
     piece* getAt(pair<size_t,size_t> position);
     void printBoardW();

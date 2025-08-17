@@ -23,11 +23,7 @@ void Knight ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
                 continue;
             }
 
-            board tempBoard = Board; 
-            tempBoard.setAt(targetSquare,this);
-            tempBoard.setAt(this->getPosition(),nullptr); 
-
-            if (tempBoard.AttackedBy(tempBoard.getKingPosition(this->isWhite()), this->isWhite()).empty()) {
+            if (!Board.isPinned(this,{firstCoord,secondCoord})) {
                 addPossibleMove(targetSquare);
                 if (pieceOnTarget != nullptr) {
                     addPossibleCapture(targetSquare);
