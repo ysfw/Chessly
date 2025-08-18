@@ -21,13 +21,25 @@ class board
 {
 private:
     vector<vector<piece*>> Board;
-    map<string,piece*> whitePieces;
-    map<string,piece*> blackPieces;
+    const std::string layout[8] = {
+        "RNBQKBNR",
+        "PPPPPPPP",
+        "........",
+        "........",
+        "........",
+        "........",
+        "pppppppp",
+        "rnbqkbnr"
+    }; //White Pieces in Capital letters
+
     pos whiteKingPosition;
     pos blackKingPosition;
     bool enpassant = false;
+    piece* createPieceFromChar(char pieceChar, pos position);
 public:
-    board();
+    board(bool FullBoardInit);
+    // true for normal game -> initialized full board
+
     vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
     void setKingPosition(bool isWhite, pos newPosition);
     pos getKingPosition(bool isWhite);
@@ -65,7 +77,6 @@ public:
     void undo();
     void redo();
     ~player();
-
 };
 
 

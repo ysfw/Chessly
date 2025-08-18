@@ -28,51 +28,44 @@ pos stringTOmove(string move)
     return {row, col};
 }
 
-board::board()
-    : Board(8, vector<piece *>(8, nullptr))
+piece *board::createPieceFromChar(char pieceChar, pos position)
 {
-    whitePieces.insert({"a1", new rook(true, {0, 0})});
-    whitePieces.insert({"b1", new Knight(true, {0, 1})});
-    whitePieces.insert({"c1", new bishop(true, {0, 2})});
-    whitePieces.insert({"e1", new king(true, {0, 4})});
-    setKingPosition(true, {0, 4});
-    whitePieces.insert({"d1", new queen(true, {0, 3})});
-    whitePieces.insert({"f1", new bishop(true, {0, 5})});
-    whitePieces.insert({"g1", new Knight(true, {0, 6})});
-    whitePieces.insert({"h1", new rook(true, {0, 7})});
-    for (size_t i = 0; i < 8; i++)
-        whitePieces.insert({string(1, 'a' + i) + "2", new pawn(true, {1, i})});
+    bool isWhite = (isupper(pieceChar) != 0);
 
-    blackPieces.insert({"a8", new rook(false, {7, 0})});
-    blackPieces.insert({"b8", new Knight(false, {7, 1})});
-    blackPieces.insert({"c8", new bishop(false, {7, 2})});
-    blackPieces.insert({"e8", new king(false, {7, 4})});
-    setKingPosition(false, {7, 4});
-    blackPieces.insert({"d8", new queen(false, {7, 3})});
-    blackPieces.insert({"f8", new bishop(false, {7, 5})});
-    blackPieces.insert({"g8", new Knight(false, {7, 6})});
-    blackPieces.insert({"h8", new rook(false, {7, 7})});
-    for (size_t i = 0; i < 8; i++)
-        blackPieces.insert({string(1, 'a' + i) + "7", new pawn(false, {6, i})});
-
-    for (size_t i = 0; i < 8; i++)
+    switch (tolower(pieceChar))
     {
-        for (size_t j = 0; j < 8; j++)
-        {
-            if (i == 0 || i == 1)
-                Board[i][j] = whitePieces[static_cast<char>('a' + j) + std::to_string(i + 1)];
-            else if (i == 6 || i == 7)
-                Board[i][j] = blackPieces[static_cast<char>('a' + j) + std::to_string(i + 1)];
-        }
+    case 'r':
+        return new rook(isWhite, position);
+    case 'n':
+        return new Knight(isWhite, position);
+    case 'b':
+        return new bishop(isWhite, position);
+    case 'q':
+        return new queen(isWhite, position);
+    case 'k':
+        isWhite? whiteKingPosition=position : blackKingPosition = position;
+        return new king(isWhite, position);
+    case 'p':
+        return new pawn(isWhite, position);
+    default:
+        return nullptr;
     }
 }
 
-board::~board() {
-    for (size_t i = 0; i < 8; ++i) {
-        for (size_t j = 0; j < 8; ++j) {
-            if (Board[i][j] != nullptr) {
-                delete Board[i][j];
-                Board[i][j] = nullptr;
+board::board(bool gameType)
+    : Board(8, vector<piece *>(8, nullptr))
+{
+    if (gameType)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                char pieceChar = layout[i][j];
+                if (pieceChar != '.')
+                {
+                    Board[i][j] = createPieceFromChar(pieceChar, {i, j});
+                }
             }
         }
     }
@@ -421,26 +414,25 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
     return result;
 }
 
-char getPromotionPiece ()
+char getPromotionPiece()
 {
     char piece;
-    cout<<"Choose What piece to promote to (N,Q,B,R): ";
-    cin>>piece;
+    cout << "Choose What piece to promote to (N,Q,B,R): ";
+    cin >> piece;
     return tolower(piece);
 }
-
 
 bool board ::isPinned(piece *piece, pos newPosition)
 {
     board tempBoard = *this;
     size_t firstCoord = newPosition.first, secondCoord = newPosition.second;
-    
+
     set<pos> possibleCaptures = piece->getPossibleCaptures();
     bool isCapture = (tempBoard.getAt(newPosition) != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn *>(piece) && !isCapture && binary_search(possibleCaptures.begin(), possibleCaptures.end(), newPosition));
     tempBoard.setAt({firstCoord, secondCoord}, piece);
     tempBoard.setAt(piece->getPosition(), nullptr);
-    
+
     if (isEnPassantCapture)
     {
         int capturedPawnRow = piece->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
@@ -454,30 +446,45 @@ bool board ::isPinned(piece *piece, pos newPosition)
         return true;
 }
 
-bool board:: isCheckmate(bool isWhiteTurn)
+bool board::isCheckmate(bool isWhiteTurn)
 {
     for (size_t i = 0; i < 8; i++)
     {
-        for(size_t j=0;j<8;j++){
-            if(!this->getAt({i,j})->getPossibleMoves().empty()) return false;
+        for (size_t j = 0; j < 8; j++)
+        {
+            if((this->getAt({i,j}) == nullptr)) continue;
+            if(this->getAt({i,j})->isWhite() != isWhiteTurn) continue;
+            
+                this->getAt({i, j})->checkMoves(*this, {i, j});
+                if (!(this->getAt({i, j})->getPossibleMoves().empty()))
+                    return false;
         }
     }
-    if((isWhiteTurn && !this->AttackedBy(whiteKingPosition,isWhiteTurn).empty()) || (!isWhiteTurn && !this->AttackedBy(blackKingPosition,isWhiteTurn).empty()))
+
+    if ((isWhiteTurn && !this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) 
+    || (!isWhiteTurn && !this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
     {
         return true;
     }
     return false;
 }
 
-bool board:: isStalemate(bool isWhiteTurn)
+bool board::isStalemate(bool isWhiteTurn)
 {
     for (size_t i = 0; i < 8; i++)
     {
-        for(size_t j=0;j<8;j++){
-            if(!this->getAt({i,j})->getPossibleMoves().empty()) return false;
+        for (size_t j = 0; j < 8; j++)
+        {
+            if((this->getAt({i,j}) == nullptr)) continue;
+            if(this->getAt({i,j})->isWhite() != isWhiteTurn) continue;
+            
+            this->getAt({i, j})->checkMoves(*this, {i, j});
+            if (!(this->getAt({i, j})->getPossibleMoves().empty()))
+                return false;
         }
     }
-    if((isWhiteTurn && this->AttackedBy(whiteKingPosition,isWhiteTurn).empty()) || (!isWhiteTurn && this->AttackedBy(blackKingPosition,isWhiteTurn).empty()))
+    if ((isWhiteTurn && this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) 
+    || (!isWhiteTurn && this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
     {
         return true;
     }
@@ -552,7 +559,7 @@ Normalgame::~Normalgame()
 
 void Normalgame ::run()
 {
-    board board;
+    board board(true);
     player White = player(true);
     player Black = player(false);
     bool whiteTurn = true;
@@ -563,14 +570,15 @@ void Normalgame ::run()
         clearScreen();
         if (board.isCheckmate(whiteTurn))
         {
-            cout<<"Black Wins By Checkmate";
+            cout << "Black Wins By Checkmate"<<endl;
             return;
         }
-        else if(board.isStalemate(whiteTurn))
+        else if (board.isStalemate(whiteTurn))
         {
-            cout<<"Draw By Stalemate";
+            cout << "Draw By Stalemate"<<endl;
+            return;
         }
-        
+
         whiteTurn ? board.printBoardW() : board.printBoardB();
         string input;
         cout << "Select a piece (e.g., e2 e4) or type exit: ";

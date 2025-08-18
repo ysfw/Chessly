@@ -94,7 +94,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     else if(isCastle)
     {
         bool kingSide = (newPosition.second > position.second);
-        player->addMove({{this,kingSide ? "O-O":"O-O-O"}, false});
+        player->addMove({{this,kingSide ? "0-0":"0-0-0"}, false});
         Board.setAt(newPosition, this);
         pos oldRookPos = {position.first, kingSide ? 7 : 0};
         pos newRookPos = {position.first, kingSide ? newPosition.second-1 : newPosition.second+1};
@@ -161,9 +161,11 @@ bool piece::Move(player *player, board &Board, pos newPosition)
 
     
     //Reseting Castling possibility for rooks and kings as anyways once they make a move (even if that move was castling) castling should reset
-    if(king *k = dynamic_cast<king *>(this)) k->resetCastling();
+    if(king *k = dynamic_cast<king *>(this)) 
+    {
+        k->resetCastling();
+        Board.setKingPosition(k->isWhite(),newPosition);
+    }
     if(rook *r = dynamic_cast<rook *>(this)) r->resetCastling();
-
-    
     return true;
 }
