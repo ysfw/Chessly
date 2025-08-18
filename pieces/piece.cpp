@@ -50,7 +50,7 @@ void piece:: clearMoves(){
 void piece :: checkMoves(board &Board, pos currPosition){}
 
 
-bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
+bool piece::Move(player *player, board &Board, pos newPosition)
 {
     if (!binary_search(this->possibleMoves.begin(), this->possibleMoves.end(), newPosition))
     {
@@ -60,7 +60,8 @@ bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
     piece* targetOnNextSquare = Board.getAt(newPosition);
     bool isCapture = (targetOnNextSquare != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn*>(this) && !isCapture && binary_search(this->possibleCaptures.begin(), this->possibleCaptures.end(), newPosition));
-    
+    bool isCastle(dynamic_cast<king*>(this) && abs((int)(position.second-newPosition.second)) == 2);
+
     // --- BRANCH 1: Standard Capture ---
     if (isCapture && !isEnPassantCapture)
     {
@@ -86,7 +87,26 @@ bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)
         this->updatePos(newPosition);
         Board.resetEnpassant(); // An en passant capture also resets the state
     }
-    // --- BRANCH 3: Standard Non-Capture Move ---
+    
+    // --- BRANCH 3: Castling Move ---
+    else if(isCastle)
+    {
+        bool kingSide = (newPosition.second > position.second);
+        player->addMove({{this,kingSide ? "O-O":"O-O-O"}, false});
+        Board.setAt(newPosition, this);
+        pos oldRookPos = {position.first, kingSide ? 7 : 0};
+        pos newRookPos = {position.first, kingSide ? newPosition.second-1 : newPosition.second+1};
+        piece* rook = Board.getAt(oldRookPos);
+        Board.setAt(newRookPos, rook);
+        Board.setAt(oldRookPos, nullptr);
+        Board.setAt(position, nullptr);
+        Board.resetEnpassant();
+        this->updatePos(newPosition);
+        rook->updatePos(newRookPos);
+    }
+
+
+    // --- BRANCH 4: Standard Non-Capture Move ---
     else 
     {
         player->addMove({{this, moveTOstring(position)}, false});

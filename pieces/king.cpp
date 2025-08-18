@@ -15,19 +15,58 @@ bool king :: isCheck(board &Board,pos targetSquare){
     if(tempBoard.AttackedBy(targetSquare, this->isWhite()).empty()) return false;
     else return true;
 }
-
+//the canCastle is just an indicator of "did it make a move or not?" 
 bool king::canKingCastle(){
     return canCastle;
 }
+
+
+bool king:: canKingsideCastle (board &Board){
+    if(this->canCastle){
+        size_t firstCoord = this->getPosition().first, secondCoord = this->getPosition().second;
+
+        for (size_t i =1; i < 3; i++)
+        {
+            if(Board.getAt({firstCoord,secondCoord+i}) != nullptr || !Board.AttackedBy({firstCoord,secondCoord+i},this->isWhite()).empty())
+                return false;
+        }
+        rook* r = dynamic_cast<rook*>(Board.getAt({firstCoord,secondCoord+3}));
+        if(r!= nullptr && r->canRookCastle()) return true;
+    }
+    return false;
+}
+
+bool king:: canQueensideCastle (board &Board){
+if(this->canCastle){
+        size_t firstCoord = this->getPosition().first, secondCoord = this->getPosition().second;
+
+        for (size_t i =1; i < 4; i++)
+        {
+            if(Board.getAt({firstCoord,secondCoord-i}) != nullptr || !Board.AttackedBy({firstCoord,secondCoord-i},this->isWhite()).empty())
+                return false;
+        }
+        rook* r = dynamic_cast<rook*>(Board.getAt({firstCoord,secondCoord-4}));
+        if(r!= nullptr && r->canRookCastle()) return true;
+    }
+    return false;
+}
+
 
 void king::resetCastling() {
     canCastle = false;
 }
 
-void king::checkMoves(board &Board, pair<size_t, size_t> position) {
+void king::checkMoves(board &Board, pos position) {
     clearMoves();
-    pair<int, int> directions[8] = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    //Checking for a possible castle
+    if(canKingsideCastle(Board)){
+        addPossibleMove({this->getPosition().first,this->getPosition().second+2});
+    }
+    if(canQueensideCastle(Board)){
+        addPossibleMove({this->getPosition().first,this->getPosition().second-2});
+    }
 
+    pair<int, int> directions[8] = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
     for (pair<int, int> direction : directions) {
         int firstCoord = (int)this->getPosition().first + direction.first;
         int secondCoord = (int)this->getPosition().second + direction.second;
