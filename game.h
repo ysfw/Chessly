@@ -3,8 +3,11 @@
 #include "pieces/piece.h"
 using namespace std;
 
+
+//Helper Functions
 string moveTOstring(pos Position);
 pos stringTOmove(string move);
+char getPromotionPiece();
 void clearScreen();
 
 
@@ -22,8 +25,7 @@ private:
     map<string,piece*> blackPieces;
     pos whiteKingPosition;
     pos blackKingPosition;
-    bool enpassant = false , check = false , 
-    checkmate = false , stalemate = false ;
+    bool enpassant = false;
 public:
     board();
     vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
@@ -32,11 +34,8 @@ public:
     bool isEnpassant ();
     void setEnpassant();
     void resetEnpassant();
-    bool isCheck();
-    void setCheck();
-    void resetCheck();
-    bool isMate ();
-    bool isStalemate ();
+    bool isCheckmate (bool isWhiteTurn);
+    bool isStalemate (bool isWhiteTurn);
     bool isTrifoldDraw ();
     bool isPinned(piece* piece, pos newPosition);
     void setAt(pos position,piece* Pointer2piece);

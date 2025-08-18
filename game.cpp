@@ -67,6 +67,17 @@ board::board()
     }
 }
 
+board::~board() {
+    for (size_t i = 0; i < 8; ++i) {
+        for (size_t j = 0; j < 8; ++j) {
+            if (Board[i][j] != nullptr) {
+                delete Board[i][j];
+                Board[i][j] = nullptr;
+            }
+        }
+    }
+}
+
 piece *board ::getAt(pos position)
 {
     return Board[position.first][position.second];
@@ -90,20 +101,6 @@ void board ::setEnpassant()
 void board ::resetEnpassant()
 {
     enpassant = false;
-}
-
-bool board::isCheck()
-{
-    return check;
-}
-void board ::setCheck()
-{
-    check = true;
-}
-
-void board ::resetCheck()
-{
-    check = false;
 }
 
 void board::setKingPosition(bool isWhite, pos newPosition)
@@ -424,6 +421,15 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
     return result;
 }
 
+char getPromotionPiece ()
+{
+    char piece;
+    cout<<"Choose What piece to promote to (N,Q,B,R): ";
+    cin>>piece;
+    return tolower(piece);
+}
+
+
 bool board ::isPinned(piece *piece, pos newPosition)
 {
     board tempBoard = *this;
@@ -446,6 +452,36 @@ bool board ::isPinned(piece *piece, pos newPosition)
         return false;
     else
         return true;
+}
+
+bool board:: isCheckmate(bool isWhiteTurn)
+{
+    for (size_t i = 0; i < 8; i++)
+    {
+        for(size_t j=0;j<8;j++){
+            if(!this->getAt({i,j})->getPossibleMoves().empty()) return false;
+        }
+    }
+    if((isWhiteTurn && !this->AttackedBy(whiteKingPosition,isWhiteTurn).empty()) || (!isWhiteTurn && !this->AttackedBy(blackKingPosition,isWhiteTurn).empty()))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool board:: isStalemate(bool isWhiteTurn)
+{
+    for (size_t i = 0; i < 8; i++)
+    {
+        for(size_t j=0;j<8;j++){
+            if(!this->getAt({i,j})->getPossibleMoves().empty()) return false;
+        }
+    }
+    if((isWhiteTurn && this->AttackedBy(whiteKingPosition,isWhiteTurn).empty()) || (!isWhiteTurn && this->AttackedBy(blackKingPosition,isWhiteTurn).empty()))
+    {
+        return true;
+    }
+    return false;
 }
 
 void board ::printBoardB()
@@ -520,10 +556,21 @@ void Normalgame ::run()
     player White = player(true);
     player Black = player(false);
     bool whiteTurn = true;
+
     regex e("^[a-hA-H][1-8]$");
     while (true)
     {
         clearScreen();
+        if (board.isCheckmate(whiteTurn))
+        {
+            cout<<"Black Wins By Checkmate";
+            return;
+        }
+        else if(board.isStalemate(whiteTurn))
+        {
+            cout<<"Draw By Stalemate";
+        }
+        
         whiteTurn ? board.printBoardW() : board.printBoardB();
         string input;
         cout << "Select a piece (e.g., e2 e4) or type exit: ";

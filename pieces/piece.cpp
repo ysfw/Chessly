@@ -60,7 +60,9 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     piece* targetOnNextSquare = Board.getAt(newPosition);
     bool isCapture = (targetOnNextSquare != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn*>(this) && !isCapture && binary_search(this->possibleCaptures.begin(), this->possibleCaptures.end(), newPosition));
-    bool isCastle(dynamic_cast<king*>(this) && abs((int)(position.second-newPosition.second)) == 2);
+    bool isCastle = (dynamic_cast<king*>(this) && abs((int)(position.second-newPosition.second)) == 2);
+    bool isPromotion = (dynamic_cast<pawn*>(this) && (newPosition.first == 7 || newPosition.first == 0));
+
 
     // --- BRANCH 1: Standard Capture ---
     if (isCapture && !isEnPassantCapture)
@@ -104,9 +106,37 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         this->updatePos(newPosition);
         rook->updatePos(newRookPos);
     }
+    // --- BRANCH 4: Promotion ---
+    else if (isPromotion)
+    {
+        piece* promotedPiece = nullptr;
+        char piece = getPromotionPiece();
+        switch (piece)
+        {
+        case 'q':
+            promotedPiece = new queen(this->White, newPosition);
+            break;
+        case 'r':
+            promotedPiece = new rook(this->White, newPosition);
+            break;
+        case 'b':
+            promotedPiece = new bishop(this->White, newPosition);
+            break;
+        case 'n':
+            promotedPiece = new Knight(this->White, newPosition);
+            break;
+        default:
+            promotedPiece = new queen(this->White, newPosition);
+            break;
+        }
+        player->addMove({{this, moveTOstring(position)}, false});
+        Board.setAt(newPosition, promotedPiece);
+        Board.setAt(position, nullptr);
+        Board.resetEnpassant();
+    }
+    
 
-
-    // --- BRANCH 4: Standard Non-Capture Move ---
+    // --- BRANCH 5: Standard Non-Capture Move ---
     else 
     {
         player->addMove({{this, moveTOstring(position)}, false});
@@ -127,6 +157,8 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         this->updatePos(newPosition);
     }
     
+
+
     
     //Reseting Castling possibility for rooks and kings as anyways once they make a move (even if that move was castling) castling should reset
     if(king *k = dynamic_cast<king *>(this)) k->resetCastling();
