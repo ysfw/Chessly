@@ -4,31 +4,32 @@ using namespace std;
 class player;
 class board;
 class game;
+typedef pair<size_t,size_t> pos;
 
 class piece
 {
 private:
-    pair<size_t,size_t> position;
+    pos position;
     bool White;
     string value ;
-    set<pair<size_t,size_t>> possibleMoves;
-    set<pair<size_t,size_t>> possibleCaptures;
+    set<pos> possibleMoves;
+    set<pos> possibleCaptures;
 
 public:
     piece();
-    piece(bool isWhite, pair<size_t,size_t> startingPosition);
+    piece(bool isWhite, pos startingPosition);
     virtual ~piece();
     bool isWhite();
-    void updatePos(pair<size_t,size_t> newPosition);
-    pair<size_t,size_t> getPosition();
+    void updatePos(pos newPosition);
+    pos getPosition();
     string getValue();
     void setValue(string);
-    void addPossibleMove(pair<size_t,size_t> move);
-    void addPossibleCapture(pair<size_t,size_t> move);
-    set<pair<size_t,size_t>> getPossibleMoves ();
-    set<pair<size_t,size_t>> getPossibleCaptures ();
-    bool Move(player *player,board &Board,pair<size_t,size_t> newPosition);
-    virtual void checkMoves(board &Board, pair<size_t,size_t> currPosition);
+    void addPossibleMove(pos move);
+    void addPossibleCapture(pos move);
+    set<pos> getPossibleMoves ();
+    set<pos> getPossibleCaptures ();
+    bool Move(player *player,board &Board,pos newPosition);
+    virtual void checkMoves(board &Board, pos currPosition);
     void clearMoves();
 
 };
@@ -38,18 +39,18 @@ class rook : public piece {
 private:
     bool canCastle;
 public:
-   rook(bool White, pair<size_t, size_t> startingPosition);
+   rook(bool White, pos startingPosition);
    bool canRookCastle();
    void resetCastling();
-   void checkMoves(board &Board, pair<size_t, size_t> currPos)override;
+   void checkMoves(board &Board, pos currPos)override;
 };
 
 
 class bishop : public piece
 {
 public:
-    bishop(bool isWhite, pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board, pair<size_t,size_t> currPosition)override;
+    bishop(bool isWhite, pos startingPosition);
+    void checkMoves(board &Board, pos currPosition)override;
 };
 
 
@@ -59,17 +60,17 @@ private:
     bool canCastle;
 public:
     king(bool White, pair<int, int> startingPosition);
-    void checkMoves(board &Board, pair<size_t, size_t> position)override;
+    void checkMoves(board &Board, pos position)override;
     bool canKingCastle();
     void resetCastling();
-    bool isCheck(board &Board,pair<size_t,size_t> targetSquare);
+    bool isCheck(board &Board,pos targetSquare);
 };
 
 class Knight : public piece
 {
     public:
-    Knight(bool White, pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board, pair<size_t,size_t> currPosition)override;
+    Knight(bool White, pos startingPosition);
+    void checkMoves(board &Board, pos currPosition)override;
 };
 
 
@@ -83,8 +84,8 @@ class pawn : public piece
     bool ISenpassant();
     void setenpassant();
     void resetenpassant();
-    pawn(bool isWhite,pair<size_t,size_t> startingPosition);
-    void checkMoves(board &Board,pair<size_t,size_t> currPosition)override;
+    pawn(bool isWhite,pos startingPosition);
+    void checkMoves(board &Board,pos currPosition)override;
 };
 
 
@@ -92,8 +93,8 @@ class pawn : public piece
 class queen : public piece
 {
 public:
-queen(bool White, pair<size_t, size_t> startingPosition);
-void checkMoves(board &Board, pair<size_t, size_t> currPosition)override;
+queen(bool White, pos startingPosition);
+void checkMoves(board &Board, pos currPosition)override;
 };
 
 

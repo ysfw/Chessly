@@ -11,7 +11,7 @@ void clearScreen()
 #endif
 }
 
-string moveTOstring(pair<size_t, size_t> Position)
+string moveTOstring(pos Position)
 {
     string move = "";
     move += (static_cast<char>('a' + Position.second));
@@ -19,7 +19,7 @@ string moveTOstring(pair<size_t, size_t> Position)
     return move;
 }
 
-pair<size_t, size_t> stringTOmove(string move)
+pos stringTOmove(string move)
 {
     size_t col, row;
     char file = move[0], rank = move[1];
@@ -67,12 +67,12 @@ board::board()
     }
 }
 
-piece *board ::getAt(pair<size_t, size_t> position)
+piece *board ::getAt(pos position)
 {
     return Board[position.first][position.second];
 }
 
-void board ::setAt(pair<size_t, size_t> position, piece *Pointer2piece)
+void board ::setAt(pos position, piece *Pointer2piece)
 {
     Board[position.first][position.second] = Pointer2piece;
 }
@@ -106,17 +106,17 @@ void board ::resetCheck()
     check = false;
 }
 
-void board::setKingPosition(bool isWhite, pair<size_t, size_t> newPosition)
+void board::setKingPosition(bool isWhite, pos newPosition)
 {
     isWhite ? whiteKingPosition = newPosition : blackKingPosition = newPosition;
 }
 
-pair<size_t, size_t> board ::getKingPosition(bool isWhite)
+pos board ::getKingPosition(bool isWhite)
 {
     return isWhite ? whiteKingPosition : blackKingPosition;
 }
 
-vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefenderWhite)
+vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
 {
     vector<AttackInfo> result;
     for (size_t i = 0; i < 8; i++)
@@ -129,7 +129,7 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
             }
             else
             {
-                set<pair<size_t, size_t>> possiblePath;
+                set<pos> possiblePath;
                 AttackInfo currAttk;
                 if (pawn *p = dynamic_cast<pawn *>(this->getAt({i, j})))
                 {
@@ -424,12 +424,12 @@ vector<AttackInfo> board ::AttackedBy(pair<size_t, size_t> Position, bool isDefe
     return result;
 }
 
-bool board ::isPinned(piece *piece, pair<size_t, size_t> newPosition)
+bool board ::isPinned(piece *piece, pos newPosition)
 {
     board tempBoard = *this;
     size_t firstCoord = newPosition.first, secondCoord = newPosition.second;
     
-    set<pair<size_t, size_t>> possibleCaptures = piece->getPossibleCaptures();
+    set<pos> possibleCaptures = piece->getPossibleCaptures();
     bool isCapture = (tempBoard.getAt(newPosition) != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn *>(piece) && !isCapture && binary_search(possibleCaptures.begin(), possibleCaptures.end(), newPosition));
     tempBoard.setAt({firstCoord, secondCoord}, piece);
@@ -438,7 +438,7 @@ bool board ::isPinned(piece *piece, pair<size_t, size_t> newPosition)
     if (isEnPassantCapture)
     {
         int capturedPawnRow = piece->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
-        pair<size_t, size_t> capturedPawnPos = {(size_t)capturedPawnRow, newPosition.second};
+        pos capturedPawnPos = {(size_t)capturedPawnRow, newPosition.second};
         tempBoard.setAt(capturedPawnPos, nullptr);
     }
 
@@ -537,7 +537,7 @@ void Normalgame ::run()
 
         else if (regex_match(input, e))
         {
-            pair<size_t, size_t> position = stringTOmove(input);
+            pos position = stringTOmove(input);
             piece *selected = board.getAt(position);
             if (selected == nullptr || whiteTurn != selected->isWhite())
             {
@@ -549,8 +549,8 @@ void Normalgame ::run()
             clearScreen();
             whiteTurn ? board.printBoardW() : board.printBoardB();
             selected->checkMoves(board, position);
-            set<pair<size_t, size_t>> moves = selected->getPossibleMoves();
-            set<pair<size_t, size_t>> captures = selected->getPossibleCaptures();
+            set<pos> moves = selected->getPossibleMoves();
+            set<pos> captures = selected->getPossibleCaptures();
             if (moves.empty())
             {
                 cout << "No possible moves" << endl;
@@ -558,7 +558,7 @@ void Normalgame ::run()
                 continue;
             }
             cout << "Possible moves (Red is capturable): ";
-            for (pair<size_t, size_t> move : moves)
+            for (pos move : moves)
             {
                 string moveString = moveTOstring(move);
                 if (binary_search(captures.begin(), captures.end(), move))

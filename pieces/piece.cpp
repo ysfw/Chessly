@@ -5,13 +5,13 @@ using namespace std;
 
 bool piece::isWhite(){return White;}
 
-piece :: piece (bool isWhite, pair<size_t,size_t> startingPosition)
+piece :: piece (bool isWhite, pos startingPosition)
 : position(startingPosition), White(isWhite), value(""), possibleMoves() {}
 
 piece::piece()
 : position({0,0}), White(false), value(""), possibleMoves() {}
 
-pair<size_t,size_t> piece::getPosition()
+pos piece::getPosition()
 {
     return this->position;
 }
@@ -19,7 +19,7 @@ pair<size_t,size_t> piece::getPosition()
 piece :: ~piece(){
 }
 
-void piece::updatePos(pair<size_t,size_t> newPosition)
+void piece::updatePos(pos newPosition)
 {
     this->position = newPosition;
 }
@@ -32,22 +32,22 @@ void piece::setValue(string newValue){
     this->value = newValue;
 }
 
-void piece:: addPossibleMove(pair<size_t,size_t> move){
+void piece:: addPossibleMove(pos move){
     possibleMoves.insert(move);
 }
 
-void piece:: addPossibleCapture(pair<size_t,size_t> move){
+void piece:: addPossibleCapture(pos move){
     possibleCaptures.insert(move);
 }
-set<pair<size_t,size_t>> piece :: getPossibleMoves () {return possibleMoves;};
-set<pair<size_t,size_t>> piece :: getPossibleCaptures () {return possibleCaptures;};
+set<pos> piece :: getPossibleMoves () {return possibleMoves;};
+set<pos> piece :: getPossibleCaptures () {return possibleCaptures;};
 
 void piece:: clearMoves(){
     possibleMoves.clear();
     possibleCaptures.clear();
 }
 
-void piece :: checkMoves(board &Board, pair<size_t,size_t> currPosition){}
+void piece :: checkMoves(board &Board, pos currPosition){}
 
 
 bool piece::Move(player *player, board &Board, pair<size_t, size_t> newPosition)

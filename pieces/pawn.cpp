@@ -1,7 +1,7 @@
 #include "piece.h"
 #include "game.h"
 
-pawn::pawn(bool isWhite,pair<size_t,size_t> startingPosition)
+pawn::pawn(bool isWhite,pos startingPosition)
 : piece(isWhite, startingPosition)
 {
     setValue(isWhite ?  "♟" : "♙");
@@ -20,7 +20,7 @@ bool pawn ::ISenpassant()
     return enpassant;
 }
 
-void pawn ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
+void pawn ::checkMoves(board &Board, pos currPosition)
 {
     clearMoves();
     if (this->isWhite())

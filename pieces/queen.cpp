@@ -1,12 +1,12 @@
 #include "piece.h"
 #include "game.h"
-queen::queen(bool isWhite, pair<size_t, size_t> startingPosition)
+queen::queen(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♛" : "♕");
 }
 
-void queen::checkMoves(board &Board, pair<size_t, size_t> currPosition)
+void queen::checkMoves(board &Board, pos currPosition)
 {
     clearMoves();
     for (size_t direction = 1; direction < 5; direction++)

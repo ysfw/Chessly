@@ -1,13 +1,13 @@
 #include "piece.h"
 #include "game.h"
 
-Knight::Knight(bool isWhite, pair<size_t, size_t> startingPosition)
+Knight::Knight(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♞" : "♘");
 }
 
-void Knight ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
+void Knight ::checkMoves(board &Board, pos currPosition)
 {
     clearMoves();
     pair<int,int> directions [8]  = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{-1,2},{1,-2},{-1,-2}};
@@ -16,7 +16,7 @@ void Knight ::checkMoves(board &Board, pair<size_t, size_t> currPosition)
         int secondCoord = (int)this->getPosition().second + direction.second;
         if((firstCoord <8 &&firstCoord >= 0 && secondCoord < 8  && secondCoord >=0))
         {
-            pair<size_t, size_t> targetSquare = {(size_t)firstCoord, (size_t)secondCoord};
+            pos targetSquare = {(size_t)firstCoord, (size_t)secondCoord};
             piece* pieceOnTarget = Board.getAt(targetSquare);
 
             if (pieceOnTarget != nullptr && pieceOnTarget->isWhite() == this->isWhite()) {

@@ -1,12 +1,12 @@
 #include "piece.h"
 #include "game.h"
-bishop::bishop(bool isWhite, pair<size_t,size_t> startingPosition)
+bishop::bishop(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♝":"♗");    
 }
 
-void bishop :: checkMoves(board &Board, pair<size_t,size_t> currPosition)
+void bishop :: checkMoves(board &Board, pos currPosition)
 {
     clearMoves();
     for (size_t direction = 1; direction < 5; direction++){

@@ -3,14 +3,14 @@
 #include "pieces/piece.h"
 using namespace std;
 
-string moveTOstring(pair<size_t,size_t> Position);
-pair<size_t,size_t> stringTOmove(string move);
+string moveTOstring(pos Position);
+pos stringTOmove(string move);
 void clearScreen();
 
 
 struct AttackInfo {
     piece* attacker; // A pointer to the piece delivering the attack
-    set<pair<size_t,size_t>> path; // The squares between the attacker and a given square.
+    set<pos> path; // The squares between the attacker and a given square.
     // This will be EMPTY for direct attackers like knights and pawns.
 };
 
@@ -20,15 +20,15 @@ private:
     vector<vector<piece*>> Board;
     map<string,piece*> whitePieces;
     map<string,piece*> blackPieces;
-    pair<size_t,size_t> whiteKingPosition;
-    pair<size_t,size_t> blackKingPosition;
+    pos whiteKingPosition;
+    pos blackKingPosition;
     bool enpassant = false , check = false , 
     checkmate = false , stalemate = false ;
 public:
     board();
-    vector<AttackInfo> AttackedBy(pair<size_t,size_t> Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
-    void setKingPosition(bool isWhite, pair<size_t,size_t> newPosition);
-    pair<size_t,size_t> getKingPosition(bool isWhite);
+    vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
+    void setKingPosition(bool isWhite, pos newPosition);
+    pos getKingPosition(bool isWhite);
     bool isEnpassant ();
     void setEnpassant();
     void resetEnpassant();
@@ -38,9 +38,9 @@ public:
     bool isMate ();
     bool isStalemate ();
     bool isTrifoldDraw ();
-    bool isPinned(piece* piece, pair<size_t,size_t> newPosition);
-    void setAt(pair<size_t,size_t> position,piece* Pointer2piece);
-    piece* getAt(pair<size_t,size_t> position);
+    bool isPinned(piece* piece, pos newPosition);
+    void setAt(pos position,piece* Pointer2piece);
+    piece* getAt(pos position);
     void printBoardW();
     void printBoardB();
 };

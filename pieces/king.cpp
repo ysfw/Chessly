@@ -8,7 +8,7 @@ king::king(bool isWhite, pair<int, int> startingPosition)
     else canCastle = false;
 }
 
-bool king :: isCheck(board &Board,pair<size_t,size_t> targetSquare){
+bool king :: isCheck(board &Board,pos targetSquare){
     board tempBoard = Board; 
     tempBoard.setAt(targetSquare,this);
     tempBoard.setAt(this->getPosition(),nullptr);

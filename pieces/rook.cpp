@@ -1,6 +1,6 @@
 #include "piece.h"
 #include "game.h"
-rook::rook(bool isWhite, pair<size_t, size_t> startingPosition)
+rook::rook(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
     setValue(isWhite ? "♜" : "♖");
@@ -21,7 +21,7 @@ void rook::resetCastling()
     canCastle = false;
 }
 
-void rook::checkMoves(board &Board, pair<size_t, size_t> currPos)
+void rook::checkMoves(board &Board, pos currPos)
 {
     clearMoves();
     for (int direction = 1; direction < 5; direction++)
