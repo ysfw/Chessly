@@ -11,7 +11,8 @@ class piece
 private:
     pos position;
     bool White;
-    string value ;
+    string printableValue;
+    char type;
     set<pos> possibleMoves;
     set<pos> possibleCaptures;
 
@@ -22,8 +23,10 @@ public:
     bool isWhite();
     void updatePos(pos newPosition);
     pos getPosition();
-    string getValue();
-    void setValue(string);
+    char getType();
+    void setType(char newType);
+    string getprintableValue();
+    void setprintableValue(string);
     void addPossibleMove(pos move);
     void addPossibleCapture(pos move);
     set<pos> getPossibleMoves ();

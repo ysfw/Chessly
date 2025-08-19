@@ -3,7 +3,8 @@
 queen::queen(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ? "♛" : "♕");
+    setprintableValue(isWhite ? "♛" : "♕");
+    setType('q');
 }
 
 void queen::checkMoves(board &Board, pos currPosition)

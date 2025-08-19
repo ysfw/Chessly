@@ -4,7 +4,8 @@
 pawn::pawn(bool isWhite,pos startingPosition)
 : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ?  "♟" : "♙");
+    setprintableValue(isWhite ?  "♟" : "♙");
+    setType('p');
 }
 
 void pawn :: setenpassant (){

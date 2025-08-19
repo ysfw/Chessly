@@ -4,7 +4,8 @@
 Knight::Knight(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ? "♞" : "♘");
+    setprintableValue(isWhite ? "♞" : "♘");
+    setType('n');
 }
 
 void Knight ::checkMoves(board &Board, pos currPosition)

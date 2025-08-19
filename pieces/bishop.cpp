@@ -3,7 +3,8 @@
 bishop::bishop(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ? "♝":"♗");    
+    setprintableValue(isWhite ? "♝":"♗");    
+    setType('b');
 }
 
 void bishop :: checkMoves(board &Board, pos currPosition)

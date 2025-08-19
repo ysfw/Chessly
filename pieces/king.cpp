@@ -3,7 +3,8 @@
 king::king(bool isWhite, pair<int, int> startingPosition)
     : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ? "♚":"♔");
+    setprintableValue(isWhite ? "♚":"♔");
+    setType('k');
     if((isWhite && startingPosition == pair<int,int>{0,4}) || (!isWhite && startingPosition == pair<int,int>{7,4})) canCastle = true;
     else canCastle = false;
 }

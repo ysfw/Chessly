@@ -3,7 +3,8 @@
 rook::rook(bool isWhite, pos startingPosition)
     : piece(isWhite, startingPosition)
 {
-    setValue(isWhite ? "♜" : "♖");
+    setprintableValue(isWhite ? "♜" : "♖");
+    setType('r');
     if((isWhite &&( startingPosition == pair<size_t,size_t>{0,0} || startingPosition == pair<size_t,size_t>{0,7})) 
     || (!isWhite && (startingPosition == pair<size_t,size_t>{7,7} || startingPosition == pair<size_t,size_t>{7,0})))
     canCastle = true;

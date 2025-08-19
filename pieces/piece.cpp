@@ -6,10 +6,10 @@ using namespace std;
 bool piece::isWhite(){return White;}
 
 piece :: piece (bool isWhite, pos startingPosition)
-: position(startingPosition), White(isWhite), value(""), possibleMoves() {}
+: position(startingPosition), White(isWhite), printableValue(""), possibleMoves() {}
 
 piece::piece()
-: position({0,0}), White(false), value(""), possibleMoves() {}
+: position({0,0}), White(false), printableValue(""), possibleMoves() {}
 
 pos piece::getPosition()
 {
@@ -24,13 +24,22 @@ void piece::updatePos(pos newPosition)
     this->position = newPosition;
 }
 
-string piece:: getValue(){
-    return value;
+string piece:: getprintableValue(){
+    return printableValue;
 }
 
-void piece::setValue(string newValue){
-    this->value = newValue;
+void piece::setprintableValue(string newprintableValue){
+    this->printableValue = newprintableValue;
 }
+
+char piece:: getType(){
+    return type;
+}
+
+void piece::setType(char newType){
+    this->type = newType;
+}
+
 
 void piece:: addPossibleMove(pos move){
     possibleMoves.insert(move);
@@ -41,7 +50,7 @@ void piece:: addPossibleCapture(pos move){
 }
 set<pos> piece :: getPossibleMoves () {return possibleMoves;};
 set<pos> piece :: getPossibleCaptures () {return possibleCaptures;};
-
+ 
 void piece:: clearMoves(){
     possibleMoves.clear();
     possibleCaptures.clear();
@@ -63,7 +72,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     bool isCastle = (dynamic_cast<king*>(this) && abs((int)(position.second-newPosition.second)) == 2);
     bool isPromotion = (dynamic_cast<pawn*>(this) && (newPosition.first == 7 || newPosition.first == 0));
 
-
     // --- BRANCH 1: Standard Capture ---
     if (isCapture && !isEnPassantCapture)
     {
@@ -73,6 +81,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.setAt(position, nullptr);
         this->updatePos(newPosition);
         Board.resetEnpassant(); // A capture resets any en passant opportunity
+        Board.resetEnPassantFile();
     }
     // --- BRANCH 2: En Passant Capture ---
     else if (isEnPassantCapture)
@@ -88,6 +97,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         
         this->updatePos(newPosition);
         Board.resetEnpassant(); // An en passant capture also resets the state
+        Board.resetEnPassantFile();
     }
     
     // --- BRANCH 3: Castling Move ---
@@ -103,6 +113,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.setAt(oldRookPos, nullptr);
         Board.setAt(position, nullptr);
         Board.resetEnpassant();
+        Board.resetEnPassantFile();
         this->updatePos(newPosition);
         rook->updatePos(newRookPos);
     }
@@ -133,6 +144,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.setAt(newPosition, promotedPiece);
         Board.setAt(position, nullptr);
         Board.resetEnpassant();
+        Board.resetEnPassantFile();
     }
     
 
@@ -146,18 +158,20 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         if (pawn *p = dynamic_cast<pawn *>(this)) {
             if (abs((int)newPosition.first - (int)position.first) == 2) {
                 Board.setEnpassant();
+                Board.setEnPassantFile(newPosition.second);
                 p->setenpassant();
             } else {
                 Board.resetEnpassant();
+                Board.resetEnPassantFile();
             }
         } else {
             Board.resetEnpassant();
+            Board.resetEnPassantFile();
         }
         
         this->updatePos(newPosition);
     }
     
-
 
     
     //Reseting Castling possibility for rooks and kings as anyways once they make a move (even if that move was castling) castling should reset
