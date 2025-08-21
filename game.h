@@ -45,7 +45,7 @@ private:
     - the use of uint64_t here is typically for portability and safety*/
     uint64_t zobristTable[6][2][64]; 
     uint64_t WhiteTurnkey;
-    uint64_t castlingKeys[4];  // [WKSide, WQSide, BKSide , BQSide]
+    uint64_t castlingKeys[4];  // [BKSide, BQSide, WKSide , WQSide]
     uint64_t enPassantFileKeys[8];
     uint64_t calculateZobristHash(); //Making it private because it won't be used each time only for the initial position
     void initZobrist();
@@ -70,7 +70,15 @@ public:
     void setKingPosition(bool isWhite, pos newPosition);
     pos getKingPosition(bool isWhite);
     
-    uint64_t getPiecehash(char piece,bool isWhite,string position);
+    uint64_t getPiecehash(char piece,bool isWhite,pos position);
+    uint64_t getPreviousHash();
+    uint64_t getWhiteTurnkey();
+    uint64_t getcastlingKey(int side,bool isWhite);
+    uint64_t getenPassantFileKey(int file);
+    void addHash (uint64_t newHash);
+
+    void setPreviousHash(uint64_t newHash);
+
     void makeHash(pos from, pos to, char promotionPieceType = '.');
 
     bool isEnpassant ();

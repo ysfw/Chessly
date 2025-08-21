@@ -67,14 +67,36 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     }
 
     piece* targetOnNextSquare = Board.getAt(newPosition);
+    char movingPieceType = this->getType();
+    int movingPieceColor = this->isWhite() ? 1 : 0;
+
     bool isCapture = (targetOnNextSquare != nullptr);
     bool isEnPassantCapture = (dynamic_cast<pawn*>(this) && !isCapture && binary_search(this->possibleCaptures.begin(), this->possibleCaptures.end(), newPosition));
     bool isCastle = (dynamic_cast<king*>(this) && abs((int)(position.second-newPosition.second)) == 2);
     bool isPromotion = (dynamic_cast<pawn*>(this) && (newPosition.first == 7 || newPosition.first == 0));
+    
+    uint64_t newHash = Board.getPreviousHash();
+    enum PieceType { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
+        static const map<char, int> pieceType = {
+            {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP},
+            {'r', ROOK}, {'q', QUEEN}, {'k', KING}
+        };
 
-    // --- BRANCH 1: Standard Capture ---
+    newHash^=Board.getWhiteTurnkey();
+    if (Board.getEnPassantFile() != NO_FILE) {
+            newHash ^= Board.getenPassantFileKey(Board.getEnPassantFile());
+    }
+    newHash ^= Board.getPiecehash(pieceType.at(movingPieceType),movingPieceColor,this->position);
+
+    // --- BRANCH 1: Capture ---
     if (isCapture && !isEnPassantCapture)
     {
+        newHash ^= Board.getPiecehash(pieceType.at(movingPieceType),movingPieceColor,newPosition);
+        piece* capturedPiece =Board.getAt(newPosition);
+        char capturedPieceType = capturedPiece->getType();
+        int capturedPieceColor = capturedPiece->isWhite() ? 1 : 0;
+        newHash ^= Board.getPiecehash(pieceType.at(capturedPieceType),capturedPieceColor, newPosition);
+        player->addMove({{this, moveTOstring(position)}, false});
         player->addMove({{this, moveTOstring(position)}, true});
         player->addCapture({targetOnNextSquare, moveTOstring(newPosition)});
         Board.setAt(newPosition, this);
@@ -86,6 +108,9 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 2: En Passant Capture ---
     else if (isEnPassantCapture)
     {
+        pos capturedPawnPos = {this->position.first, newPosition.second}; 
+        newHash ^= Board.getPiecehash(pieceType.at(movingPieceType),movingPieceColor,newPosition);
+        newHash ^= Board.getPiecehash(PAWN,!movingPieceColor,{capturedPawnPos.first, capturedPawnPos.second});
         player->addMove({{this, moveTOstring(position)}, true});
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
@@ -103,12 +128,15 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 3: Castling Move ---
     else if(isCastle)
     {
+        newHash ^= Board.getPiecehash(pieceType.at(movingPieceType),movingPieceColor,newPosition);
         bool kingSide = (newPosition.second > position.second);
         player->addMove({{this,kingSide ? "0-0":"0-0-0"}, false});
         Board.setAt(newPosition, this);
         pos oldRookPos = {position.first, kingSide ? 7 : 0};
         pos newRookPos = {position.first, kingSide ? newPosition.second-1 : newPosition.second+1};
         piece* rook = Board.getAt(oldRookPos);
+        newHash ^= Board.getPiecehash(ROOK,movingPieceColor,oldRookPos);
+        newHash ^= Board.getPiecehash(ROOK,movingPieceColor,newRookPos);
         Board.setAt(newRookPos, rook);
         Board.setAt(oldRookPos, nullptr);
         Board.setAt(position, nullptr);
@@ -121,8 +149,8 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     else if (isPromotion)
     {
         piece* promotedPiece = nullptr;
-        char piece = getPromotionPiece();
-        switch (piece)
+        char promotionPieceType = getPromotionPiece();
+        switch (promotionPieceType)
         {
         case 'q':
             promotedPiece = new queen(this->White, newPosition);
@@ -140,6 +168,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             promotedPiece = new queen(this->White, newPosition);
             break;
         }
+        newHash ^= Board.getPiecehash(pieceType.at(promotionPieceType), movingPieceColor, {newPosition.first , newPosition.second});
         player->addMove({{this, moveTOstring(position)}, false});
         Board.setAt(newPosition, promotedPiece);
         Board.setAt(position, nullptr);
@@ -151,12 +180,12 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 5: Standard Non-Capture Move ---
     else 
     {
-        player->addMove({{this, moveTOstring(position)}, false});
-        Board.setAt(newPosition, this);
-        Board.setAt(position, nullptr);
-        
-        if (pawn *p = dynamic_cast<pawn *>(this)) {
-            if (abs((int)newPosition.first - (int)position.first) == 2) {
+            newHash ^= Board.getPiecehash(pieceType.at(movingPieceType),movingPieceColor,newPosition);
+            Board.setAt(newPosition, this);
+            Board.setAt(position, nullptr);
+            
+            if (pawn *p = dynamic_cast<pawn *>(this)) {
+                if (abs((int)newPosition.first - (int)position.first) == 2) {
                 Board.setEnpassant();
                 Board.setEnPassantFile(newPosition.second);
                 p->setenpassant();
@@ -171,6 +200,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         
         this->updatePos(newPosition);
     }
+    
     
 
     

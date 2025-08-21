@@ -100,13 +100,13 @@ uint64_t board :: calculateZobristHash() {
                 {
                     if(k->isWhite())
                     {
-                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[0];
-                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[1];
+                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[2];
+                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[3];
                     }
                     else
                     {
-                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[2];
-                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[3];
+                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[0];
+                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[1];
                     }
                 }
             }
@@ -125,7 +125,7 @@ uint64_t board :: calculateZobristHash() {
     return hash;
 }
 
-uint64_t board:: getPiecehash(char piece,bool isWhite,string position)
+uint64_t board:: getPiecehash(char piece,bool isWhite,pos position)
 {
         int color = isWhite ? 1 : 0;
         enum PieceType { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
@@ -134,75 +134,42 @@ uint64_t board:: getPiecehash(char piece,bool isWhite,string position)
             {'r', ROOK}, {'q', QUEEN}, {'k', KING}
         };
 
-        pos curr = stringTOmove(position);
-        return zobristTable[pieceType.at(piece)][color][(int)curr.first*8+(int)curr.second];
+        return zobristTable[pieceType.at(piece)][color][(int)position.first*8+(int)position.second];
         
 }
 
+uint64_t board::getPreviousHash()
+{
+    return this->PreviousHash;
+}
+void board::setPreviousHash(uint64_t newHash)
+{
+    this->PreviousHash = newHash;
+}
+
+uint64_t board::getWhiteTurnkey()
+{
+    return this->WhiteTurnkey;
+}
+uint64_t board::getcastlingKey(int side,bool isWhite) 
+{
+    return this->castlingKeys[side+isWhite];
+}
+uint64_t board::getenPassantFileKey(int file)
+{
+    return this->enPassantFileKeys[file];
+}
+void board::addHash (uint64_t newHash)
+{
+    if(this->zobristHistory.find(newHash) != zobristHistory.end()) zobristHistory[newHash]++;
+    else this->zobristHistory.insert({newHash,1});
+}
+
+
 void board::makeHash(pos from, pos to, char promotionPieceType = '.')
 {
-        enum PieceType { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
-        static const map<char, int> pieceType = {
-            {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP},
-            {'r', ROOK}, {'q', QUEEN}, {'k', KING}
-        };
 
-        uint64_t newHash = PreviousHash;
 
-        piece* movingPiece = this->getAt(from);
-        piece* capturedPiece = this->getAt(to);
-    
-    
-        char movingPieceType = movingPiece->getType();
-        int movingPieceColor = movingPiece->isWhite() ? 1 : 0;
-    
-       
-        newHash ^= WhiteTurnkey;
-
-        if (this->enPassantFile != NO_FILE) {
-            newHash ^= enPassantFileKeys[this->enPassantFile];
-        }
-
-        newHash ^= zobristTable[pieceType.at(movingPieceType)][movingPieceColor][from.first * 8 + from.second];
-
-        // Standard Captures
-        if (capturedPiece != nullptr) {
-            char capturedPieceType = capturedPiece->getType();
-            int capturedPieceColor = capturedPiece->isWhite() ? 1 : 0;
-            newHash ^= zobristTable[pieceType.at(capturedPieceType)][capturedPieceColor][to.first * 8 + to.second];
-        }
-        
-        // en Passant Captures
-        bool isEnPassant = (pieceType.at(movingPieceType) == PAWN && capturedPiece == nullptr && from.second != to.second);
-        if (isEnPassant) {
-            pos capturedPawnPos = {from.first, to.second}; // The pawn is on the same first as the moving pawn
-            // XOR out the captured pawn from its actual square
-            newHash ^= zobristTable[PAWN][!movingPieceColor][capturedPawnPos.first * 8 + capturedPawnPos.second];
-        }
-
-        // Promotions
-        if (promotionPieceType != '.') {
-            newHash ^= zobristTable[pieceType.at(promotionPieceType)][movingPieceColor][to.first * 8 + to.second];
-        } else {
-            // D. Normal Moves (Not a promotion)
-            // XOR in the moving piece at its new square
-            newHash ^= zobristTable[pieceType.at(movingPieceType)][movingPieceColor][to.first * 8 + to.second];
-        }
-
-        // --- 3. Handle Castling (the Rook's move) ---
-        bool isCastle = (movingPieceType == KING && abs((int)from.second - (int)to.second) == 2);
-        if (isCastle) {
-            pos rookFrom, rookTo;
-            if (to.second > from.second) { // Kingside
-                rookFrom = {from.first, 7};
-                rookTo = {from.first, 5};
-            } else { // Queenside
-                rookFrom = {from.first, 0};
-                rookTo = {from.first, 3};
-            }
-            // XOR the rook out of its old square and into its new one
-            newHash ^= zobristTable[ROOK][movingPieceColor][rookFrom.first * 8 + rookFrom.second];
-            newHash ^= zobristTable[ROOK][movingPieceColor][rookTo.first * 8 + rookTo.second];
         }
 
         // --- 4. XOR IN the new castling and en passant rights ---
