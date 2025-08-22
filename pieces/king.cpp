@@ -9,13 +9,24 @@ king::king(bool isWhite, pair<int, int> startingPosition)
     else canCastle = false;
 }
 
-bool king :: isCheck(board &Board,pos targetSquare){
-    board tempBoard = Board; 
-    tempBoard.setAt(targetSquare,this);
-    tempBoard.setAt(this->getPosition(),nullptr);
-    if(tempBoard.AttackedBy(targetSquare, this->isWhite()).empty()) return false;
-    else return true;
+bool king::isCheck(board &Board, pos targetSquare)
+{
+    pos oldPosition = this->getPosition();
+    piece* capturedPiece = Board.getAt(targetSquare);
+
+    Board.setAt(targetSquare, this);
+    Board.setAt(oldPosition, nullptr);
+    this->updatePos(targetSquare);
+
+    bool isKingAttacked = !Board.AttackedBy(targetSquare, this->isWhite()).empty();
+
+    Board.setAt(oldPosition, this);
+    Board.setAt(targetSquare, capturedPiece);
+    this->updatePos(oldPosition);
+
+    return isKingAttacked;
 }
+
 //the canCastle is just an indicator of "did it make a move or not?" 
 bool king::canKingCastle(){
     return canCastle;

@@ -6,16 +6,16 @@
 int main (){
     Normalgame game;
     game.run();
+   
 }
 
 //Remaining Stuff to be done before moving to GUI 
 
 
 /*
-- Trifold Draw
-- 50/75 move rules
 - fixing notation to the standard
 - FEN
+- 50/75 move rules
 - saving and loading positions
 - redo/undo moves
 - Refactor and optimize if possible

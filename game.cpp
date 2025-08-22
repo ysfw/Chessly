@@ -43,7 +43,7 @@ piece *board::createPieceFromChar(char pieceChar, pos position)
     case 'q':
         return new queen(isWhite, position);
     case 'k':
-        isWhite? whiteKingPosition=position : blackKingPosition = position;
+        isWhite ? whiteKingPosition = position : blackKingPosition = position;
         return new king(isWhite, position);
     case 'p':
         return new pawn(isWhite, position);
@@ -56,86 +56,109 @@ bool board::isWhiteTurn()
 {
     return whiteTurn;
 }
-void board:: switchTurns()
+void board::switchTurns()
 {
     whiteTurn = !whiteTurn;
 }
 
-
-
-void board:: initZobrist() {
+void board::initZobrist()
+{
     mt19937_64 randomEngine(12345);
     uniform_int_distribution<uint64_t> distribution;
 
-    for (int p = 0; p < 6; ++p) {
-        for (int c = 0; c < 2; ++c) {
-            for (int s = 0; s < 64; ++s) {
+    for (int p = 0; p < 6; ++p)
+    {
+        for (int c = 0; c < 2; ++c)
+        {
+            for (int s = 0; s < 64; ++s)
+            {
                 zobristTable[p][c][s] = distribution(randomEngine);
             }
         }
     }
 
     WhiteTurnkey = distribution(randomEngine);
-    for (int i = 0; i < 4; ++i) castlingKeys[i] = distribution(randomEngine);
-    for (int i = 0; i < 8; ++i) enPassantFileKeys[i] = distribution(randomEngine);
+    for (int i = 0; i < 4; ++i)
+        castlingKeys[i] = distribution(randomEngine);
+    for (int i = 0; i < 8; ++i)
+        enPassantFileKeys[i] = distribution(randomEngine);
 }
 
-uint64_t board :: calculateZobristHash() {
+uint64_t board ::calculateintitialZobristHash()
+{
     uint64_t hash = 0;
-    enum PieceType { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
-        static const map<char, int> pieceType = {
-            {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP},
-            {'r', ROOK}, {'q', QUEEN}, {'k', KING}
-        };
+    hash^=WhiteTurnkey;
+    enum PieceType
+    {
+        PAWN,
+        KNIGHT,
+        BISHOP,
+        ROOK,
+        QUEEN,
+        KING
+    };
+    static const map<char, int> pieceType = {
+        {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP}, {'r', ROOK}, {'q', QUEEN}, {'k', KING}};
     // XOR keys for each piece
-    for (int i = 0; i < 8; i++) {
-        for(int j =0;j<8;j++){
-        piece* piece = this->getAt({i,j});
-            if (piece != nullptr) {
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            piece *piece = this->getAt({i, j});
+            if (piece != nullptr)
+            {
                 char type = piece->getType();
                 int color = piece->isWhite() ? 1 : 0;
-                hash ^= zobristTable[pieceType.at(type)][color][8*i+j];
-                // XOR keys for castling rights
-                if(king* k = dynamic_cast<king*>(piece))
+                uint64_t pieceHash = zobristTable[pieceType.at(type)][color][8 * i + j];
+                hash ^= pieceHash;
+
+                
+                if (king *k = dynamic_cast<king *>(piece))
                 {
-                    if(k->isWhite())
+                    if (k->isWhite())
                     {
-                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[2];
-                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[3];
+                        if (k->canKingsideCastle(*this))
+                            hash ^= castlingKeys[2];
+                        if (k->canQueensideCastle(*this))
+                            hash ^= castlingKeys[3];
                     }
                     else
                     {
-                    if (k->canKingsideCastle(*this)) hash ^= castlingKeys[0];
-                    if (k->canQueensideCastle(*this)) hash ^= castlingKeys[1];
+                        if (k->canKingsideCastle(*this))
+                            hash ^= castlingKeys[0];
+                        if (k->canQueensideCastle(*this))
+                            hash ^= castlingKeys[1];
                     }
                 }
             }
-    }
-}
+        }
 
-    if (this->whiteTurn) {
-        hash ^= WhiteTurnkey;
     }
-
+    
     int epFile = this->getEnPassantFile();
-    if (epFile != NO_FILE) {
+    if (epFile != NO_FILE)
+    {
         hash ^= enPassantFileKeys[epFile];
     }
-    zobristHistory.insert({hash,1});
     return hash;
 }
 
-uint64_t board:: getPiecehash(char piece,bool isWhite,pos position)
+uint64_t board::getPiecehash(char piece, bool isWhite, pos position)
 {
-        int color = isWhite ? 1 : 0;
-        enum PieceType { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
-        static const map<char, int> pieceType = {
-            {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP},
-            {'r', ROOK}, {'q', QUEEN}, {'k', KING}
-        };
+    int color = isWhite ? 1 : 0;
+    enum PieceType
+    {
+        PAWN,
+        KNIGHT,
+        BISHOP,
+        ROOK,
+        QUEEN,
+        KING
+    };
+    static const map<char, int> pieceType = {
+        {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP}, {'r', ROOK}, {'q', QUEEN}, {'k', KING}};
 
-        return zobristTable[pieceType.at(piece)][color][(int)position.first*8+(int)position.second];
-        
+    return zobristTable[pieceType.at(piece)][color][(int)position.first * 8 + (int)position.second];
 }
 
 uint64_t board::getPreviousHash()
@@ -151,37 +174,24 @@ uint64_t board::getWhiteTurnkey()
 {
     return this->WhiteTurnkey;
 }
-uint64_t board::getcastlingKey(int side,bool isWhite) 
+uint64_t board::getcastlingKey(int side, bool isWhite)
 {
-    return this->castlingKeys[side+isWhite];
+    return this->castlingKeys[side + isWhite];
 }
 uint64_t board::getenPassantFileKey(int file)
 {
     return this->enPassantFileKeys[file];
 }
-void board::addHash (uint64_t newHash)
+void board::addHash(uint64_t newHash)
 {
-    if(this->zobristHistory.find(newHash) != zobristHistory.end()) zobristHistory[newHash]++;
-    else this->zobristHistory.insert({newHash,1});
+    if (this->zobristHistory.find(newHash) != zobristHistory.end())
+        {zobristHistory[newHash]++;
+    }
+    else
+    {
+        this->zobristHistory.insert({newHash, 1});
+    }
 }
-
-
-void board::makeHash(pos from, pos to, char promotionPieceType = '.')
-{
-
-
-        }
-
-        // --- 4. XOR IN the new castling and en passant rights ---
-        // This part requires checking the new board state to see what rights remain
-        // and XORing in the keys for those that are still valid. For simplicity, this
-        // can be done by XORing out the old rights and XORing in the new ones.
-        // (This often involves checking if the king or rooks have moved from their starting squares)
-}
-
-    
-
-
 
 board::board(bool FullBoardInit)
     : Board(8, vector<piece *>(8, nullptr))
@@ -203,7 +213,10 @@ board::board(bool FullBoardInit)
             }
         }
     }
-    calculateZobristHash();
+    uint64_t inititalHash = calculateintitialZobristHash();
+    this->addHash(inititalHash);
+    PreviousHash=inititalHash;
+    
 }
 
 piece *board ::getAt(pos position)
@@ -231,20 +244,25 @@ void board ::resetEnpassant()
     enpassant = false;
 }
 
-int board::getEnPassantFile() {
+int board::getEnPassantFile()
+{
     return this->enPassantFile;
 }
 
-void board:: setEnPassantFile(int file)
+void board::setEnPassantFile(int file)
 {
     enPassantFile = file;
 }
 
-void board:: resetEnPassantFile()
+void board::resetEnPassantFile()
 {
     enPassantFile = NO_FILE;
 }
 
+int board::repeted(uint64_t key)
+{
+    return zobristHistory[key];
+}
 
 void board::setKingPosition(bool isWhite, pos newPosition)
 {
@@ -571,29 +589,40 @@ char getPromotionPiece()
     cin >> piece;
     return tolower(piece);
 }
-
-bool board ::isPinned(piece *piece, pos newPosition)
+bool board::isPinned(piece *p, pos newPosition)
 {
-    board tempBoard = *this;
-    size_t firstCoord = newPosition.first, secondCoord = newPosition.second;
+    pos oldPosition = p->getPosition();
+    piece *capturedPiece = this->getAt(newPosition);
 
-    set<pos> possibleCaptures = piece->getPossibleCaptures();
-    bool isCapture = (tempBoard.getAt(newPosition) != nullptr);
-    bool isEnPassantCapture = (dynamic_cast<pawn *>(piece) && !isCapture && binary_search(possibleCaptures.begin(), possibleCaptures.end(), newPosition));
-    tempBoard.setAt({firstCoord, secondCoord}, piece);
-    tempBoard.setAt(piece->getPosition(), nullptr);
-
+    bool isEnPassantCapture = (dynamic_cast<pawn *>(p) && capturedPiece == nullptr && p->getPossibleCaptures().count(newPosition));
+    pos enPassantPawnPos;
+    piece *enPassantPawn = nullptr;
     if (isEnPassantCapture)
     {
-        int capturedPawnfirst = piece->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
-        pos capturedPawnPos = {(size_t)capturedPawnfirst, newPosition.second};
-        tempBoard.setAt(capturedPawnPos, nullptr);
+        int capturedPawnRow = p->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
+        enPassantPawnPos = {(size_t)capturedPawnRow, newPosition.second};
+        enPassantPawn = this->getAt(enPassantPawnPos);
     }
 
-    if (tempBoard.AttackedBy(tempBoard.getKingPosition(piece->isWhite()), piece->isWhite()).empty())
-        return false;
-    else
-        return true;
+    this->setAt(newPosition, p);
+    this->setAt(oldPosition, nullptr);
+    if (isEnPassantCapture)
+    {
+        this->setAt(enPassantPawnPos, nullptr);
+    }
+    p->updatePos(newPosition);
+
+    bool isKingAttacked = !this->AttackedBy(this->getKingPosition(p->isWhite()), p->isWhite()).empty();
+
+    this->setAt(oldPosition, p);
+    this->setAt(newPosition, capturedPiece);
+    if (isEnPassantCapture)
+    {
+        this->setAt(enPassantPawnPos, enPassantPawn);
+    }
+    p->updatePos(oldPosition);
+
+    return isKingAttacked;
 }
 
 bool board::isCheckmate(bool isWhiteTurn)
@@ -602,17 +631,18 @@ bool board::isCheckmate(bool isWhiteTurn)
     {
         for (size_t j = 0; j < 8; j++)
         {
-            if((this->getAt({i,j}) == nullptr)) continue;
-            if(this->getAt({i,j})->isWhite() != isWhiteTurn) continue;
-            
-                this->getAt({i, j})->checkMoves(*this, {i, j});
-                if (!(this->getAt({i, j})->getPossibleMoves().empty()))
-                    return false;
+            if ((this->getAt({i, j}) == nullptr))
+                continue;
+            if (this->getAt({i, j})->isWhite() != isWhiteTurn)
+                continue;
+
+            this->getAt({i, j})->checkMoves(*this, {i, j});
+            if (!(this->getAt({i, j})->getPossibleMoves().empty()))
+                return false;
         }
     }
 
-    if ((isWhiteTurn && !this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) 
-    || (!isWhiteTurn && !this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
+    if ((isWhiteTurn && !this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) || (!isWhiteTurn && !this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
     {
         return true;
     }
@@ -625,18 +655,31 @@ bool board::isStalemate(bool isWhiteTurn)
     {
         for (size_t j = 0; j < 8; j++)
         {
-            if((this->getAt({i,j}) == nullptr)) continue;
-            if(this->getAt({i,j})->isWhite() != isWhiteTurn) continue;
-            
+            if ((this->getAt({i, j}) == nullptr))
+                continue;
+            if (this->getAt({i, j})->isWhite() != isWhiteTurn)
+                continue;
+
             this->getAt({i, j})->checkMoves(*this, {i, j});
             if (!(this->getAt({i, j})->getPossibleMoves().empty()))
                 return false;
         }
     }
-    if ((isWhiteTurn && this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) 
-    || (!isWhiteTurn && this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
+    if ((isWhiteTurn && this->AttackedBy(whiteKingPosition, isWhiteTurn).empty()) || (!isWhiteTurn && this->AttackedBy(blackKingPosition, isWhiteTurn).empty()))
     {
         return true;
+    }
+    return false;
+}
+
+bool board::isTrifoldDraw()
+{
+    for (auto &hash : this->zobristHistory)
+    {
+        if (hash.second >= 3)
+        {
+            return true;
+        }
     }
     return false;
 }
@@ -712,20 +755,34 @@ void Normalgame ::run()
     board board(true);
     player White = player(true);
     player Black = player(false);
-    bool whiteTurn = board.isWhiteTurn();
 
     regex e("^[a-hA-H][1-8]$");
     while (true)
     {
+        bool whiteTurn = board.isWhiteTurn();
         clearScreen();
+        
+        // //debug zobrist History
+        //     std::ofstream outputFile("output.txt", std::ios::app);
+        //     if (!outputFile.is_open()) {
+        //         std::cerr << "Error opening file!" << std::endl;
+        //         return;
+        //     }
+        //     std::streambuf* originalCoutBuffer = std::cout.rdbuf();
+        //     std::cout.rdbuf(outputFile.rdbuf());
+        //     cout << "Last Hash = " << board.getPreviousHash() << "  Repeated = "<< board.repeted(board.getPreviousHash())<< endl;
+        //     std::cout.rdbuf(originalCoutBuffer);
+        //     outputFile.close();
+        // //endofdebug
+        
         if (board.isCheckmate(whiteTurn))
         {
-            cout << "Black Wins By Checkmate"<<endl;
+            cout << "Black Wins By Checkmate" << endl;
             return;
         }
         else if (board.isStalemate(whiteTurn))
         {
-            cout << "Draw By Stalemate"<<endl;
+            cout << "Draw By Stalemate" << endl;
             return;
         }
 
@@ -782,6 +839,11 @@ void Normalgame ::run()
             {
                 if (regex_match(input, e) && selected->Move(whiteTurn ? &White : &Black, board, stringTOmove(input)))
                 {
+                    if (board.isTrifoldDraw())
+                    {
+                        cout << "Draw By Repetition" << endl;
+                        return;
+                    }
                     board.switchTurns();
                     continue;
                 }

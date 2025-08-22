@@ -47,7 +47,7 @@ private:
     uint64_t WhiteTurnkey;
     uint64_t castlingKeys[4];  // [BKSide, BQSide, WKSide , WQSide]
     uint64_t enPassantFileKeys[8];
-    uint64_t calculateZobristHash(); //Making it private because it won't be used each time only for the initial position
+    uint64_t calculateintitialZobristHash(); //Making it private because it won't be used each time only for the initial position
     void initZobrist();
     unordered_map<uint64_t,int> zobristHistory; // {hash, #occurences}
     uint64_t PreviousHash;
@@ -76,10 +76,11 @@ public:
     uint64_t getcastlingKey(int side,bool isWhite);
     uint64_t getenPassantFileKey(int file);
     void addHash (uint64_t newHash);
-
     void setPreviousHash(uint64_t newHash);
 
-    void makeHash(pos from, pos to, char promotionPieceType = '.');
+    //debug
+    int repeted(uint64_t key);
+    //endofdebug
 
     bool isEnpassant ();
     void setEnpassant();
