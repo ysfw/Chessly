@@ -13,9 +13,9 @@ int main (){
 
 
 /*
-- fixing notation to the standard
-- FEN
 - 50/75 move rules
+- fixing notation to the PGN
+- FEN
 - saving and loading positions
 - redo/undo moves
 - Refactor and optimize if possible

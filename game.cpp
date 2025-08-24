@@ -212,11 +212,115 @@ board::board(bool FullBoardInit)
                 }
             }
         }
+        int whiteQueens = 2, whiteRooks = 2, whiteBishops = 2, whiteKnights = 2, whitePawns = 8;
+        int blackQueens = 2, blackRooks = 2, blackBishops = 2, blackKnights = 2, blackPawns = 8;
     }
     uint64_t inititalHash = calculateintitialZobristHash();
     this->addHash(inititalHash);
     PreviousHash=inititalHash;
     
+}
+
+void board:: minusPiece(char pieceType,bool isWhite)
+{
+    if(isWhite)
+    {
+        switch (pieceType)
+            {
+            case 'q':
+                whiteQueens--;
+                break;
+            case 'r':
+                whiteRooks--;
+                break;
+            case 'b':
+                whiteBishops--;
+                break;
+            case 'n':
+                whiteKnights--;
+                break;
+            case 'p':
+                whitePawns--;
+                break;    
+            default:
+                break;
+            }
+    }
+    else
+    {
+        switch (pieceType)
+            {
+            case 'q':
+                blackQueens--;
+                break;
+            case 'r':
+                blackRooks--;
+                break;
+            case 'b':
+                blackBishops--;
+                break;
+            case 'n':
+                blackKnights--;
+                break;
+            case 'p':
+                blackPawns--;
+                break;    
+            default:
+                break;
+            }
+    }
+
+}
+
+void board:: plusPiece(char pieceType,bool isWhite)
+{
+    if(isWhite)
+    {
+        switch (pieceType)
+            {
+            case 'q':
+                whiteQueens++;
+                break;
+            case 'r':
+                whiteRooks++;
+                break;
+            case 'b':
+                whiteBishops++;
+                break;
+            case 'n':
+                whiteKnights++;
+                break;
+            case 'p':
+                whitePawns++;
+                break;    
+            default:
+                break;
+            }
+    }
+    else
+    {
+        switch (pieceType)
+            {
+            case 'q':
+                blackQueens++;
+                break;
+            case 'r':
+                blackRooks++;
+                break;
+            case 'b':
+                blackBishops++;
+                break;
+            case 'n':
+                blackKnights++;
+                break;
+            case 'p':
+                blackPawns++;
+                break;    
+            default:
+                break;
+            }
+    }
+
 }
 
 piece *board ::getAt(pos position)
@@ -684,6 +788,59 @@ bool board::isTrifoldDraw()
     return false;
 }
 
+
+bool board::isInsufficientMaterial() {
+
+    // If any player has a Queen, Rook, or Pawn, it's not a draw.
+    if (whiteQueens > 0 || whiteRooks > 0 || whitePawns > 0) return false;
+    if (blackQueens > 0 || blackRooks > 0 || blackPawns > 0) return false;
+
+
+    int totalBishops = whiteBishops + blackBishops;
+    int totalKnights = whiteKnights + blackKnights;
+
+    // King vs King, King + Bishop vs King, or King + Knight vs King
+    if (totalBishops <= 1 && totalKnights <= 1) {
+        return true;
+    }
+
+    // King + Two Knights vs King
+    if (whiteKnights == 2 && blackBishops == 0 && blackKnights == 0) return true;
+    if (blackKnights == 2 && whiteBishops == 0 && whiteKnights == 0) return true;
+
+    // King + Bishop vs King + Bishop on same-colored squares
+    if (blackBishops == 1 && whiteBishops == 1 && whiteKnights == 0 && blackKnights == 0)
+    {
+        bool WhiteBishopOnWhiteSquare=false,BlackBishopOnWhiteSquare=false;
+        int bishopsFound =0;
+        for (size_t i = 0; i < 8; i++)
+        {
+            if(bishopsFound == 2) break;
+            for (size_t j = 0; j < 8; j++)
+            {
+                if(bishopsFound == 2) break;
+                piece* target = this->getAt({i,j});
+                if(target==nullptr) continue;
+                else if(bishop* b = dynamic_cast<bishop*> (target)) 
+                {
+                    bishopsFound++;
+                    bool isWhite = b->isWhite();
+                    if(isWhite&&((i + j) % 2 != 0)) WhiteBishopOnWhiteSquare = true;
+                    if(!isWhite&&((i + j) % 2 != 0)) BlackBishopOnWhiteSquare = true;
+                }
+            }
+            
+        }
+        if(WhiteBishopOnWhiteSquare == BlackBishopOnWhiteSquare) return true;
+        
+    }
+    
+
+
+    // If none of the draw conditions were met, there is sufficient material.
+    return false;
+}
+
 void board ::printBoardB()
 {
     for (size_t i = 0; i < 8; i++)
@@ -692,7 +849,7 @@ void board ::printBoardB()
         for (int j = 7; j >= 0; j--)
         {
             if (Board[i][j] == nullptr)
-                (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
+                (i + j) % 2 == 0 ? cout << "□" << ' ' : cout << "■" << ' ';
             else
                 cout << Board[i][j]->getprintableValue() << ' ';
         }
@@ -712,7 +869,7 @@ void board ::printBoardW()
         for (size_t j = 0; j < 8; j++)
         {
             if (Board[i][j] == nullptr)
-                (i + j) % 2 == 0 ? cout << "■" << ' ' : cout << "□" << ' ';
+                (i + j) % 2 == 0 ? cout << "□" << ' ' : cout << "■" << ' ';
             else
                 cout << Board[i][j]->getprintableValue() << ' ';
         }

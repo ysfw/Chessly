@@ -106,7 +106,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         char capturedPieceType = targetOnNextSquare->getType();
         int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
-
+        Board.minusPiece(capturedPieceType,capturedPieceColor);
         if (rook *r = dynamic_cast<rook *>(targetOnNextSquare))
         {
             if (r->canRookCastle())
@@ -130,6 +130,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 2: En Passant Capture ---
     else if (isEnPassantCapture)
     {
+        Board.minusPiece('p',!movingPieceColor);
         pos capturedPawnPos = {this->position.first, newPosition.second};
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         newHash ^= Board.getPiecehash(PAWN, !movingPieceColor, {capturedPawnPos.first, capturedPawnPos.second});
@@ -173,6 +174,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     {
         piece *promotedPiece = nullptr;
         char promotionPieceType = getPromotionPiece();
+        Board.plusPiece(promotionPieceType,this->White);
         switch (promotionPieceType)
         {
         case 'q':
@@ -188,13 +190,13 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             promotedPiece = new Knight(this->White, newPosition);
             break;
         default:
-            promotedPiece = new queen(this->White, newPosition);
             break;
         }
         if (targetOnNextSquare != nullptr)
         {
             char capturedPieceType = targetOnNextSquare->getType();
             int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
+            Board.minusPiece(capturedPieceType,capturedPieceColor);
             newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
         }
         newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
