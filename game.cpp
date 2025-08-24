@@ -871,11 +871,11 @@ bool board::isInsufficientMaterial() {
 
 bool board:: is50MoveDraw()
 {
-    return (halfmovesNoCaptures >=50);
+    return (halfmovesNoCaptures >=100);
 }
 bool board:: is75MoveDraw()
 {
-    return (halfmovesNoCaptures == 75);
+    return (halfmovesNoCaptures == 150);
 }
     
 
