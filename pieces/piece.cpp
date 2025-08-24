@@ -103,6 +103,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 1: Capture ---
     if (isCapture && !isEnPassantCapture)
     {
+        Board.resetHalfMovesNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         char capturedPieceType = targetOnNextSquare->getType();
         int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
@@ -130,6 +131,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 2: En Passant Capture ---
     else if (isEnPassantCapture)
     {
+        Board.resetHalfMovesNoCaptures();
         Board.minusPiece('p',!movingPieceColor);
         pos capturedPawnPos = {this->position.first, newPosition.second};
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
@@ -151,6 +153,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 3: Castling Move ---
     else if (isCastle)
     {
+        Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         bool kingSide = (newPosition.second > position.second);
         player->addMove({{this, kingSide ? "0-0" : "0-0-0"}, false});
@@ -172,9 +175,11 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 4: Promotion ---
     else if (isPromotion)
     {
+
         piece *promotedPiece = nullptr;
         char promotionPieceType = getPromotionPiece();
         Board.plusPiece(promotionPieceType,this->White);
+        Board.minusPiece('p',this->White);
         switch (promotionPieceType)
         {
         case 'q':
@@ -199,6 +204,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             Board.minusPiece(capturedPieceType,capturedPieceColor);
             newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
         }
+        else Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
         player->addMove({{this, moveTOstring(position)}, false});
         Board.setAt(newPosition, promotedPiece);
@@ -232,7 +238,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         }
         else
         {
-
+            Board.plusHalfMoveNoCaptures();
             Board.resetEnpassant();
             Board.resetEnPassantFile();
         }
@@ -265,4 +271,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     Board.addHash(newHash);
     Board.setPreviousHash(newHash);
     return true;
+
+    if(!Board.isWhiteTurn()) Board.plusFullMove();
 }

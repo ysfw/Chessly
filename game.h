@@ -54,20 +54,29 @@ private:
     pos whiteKingPosition;
     pos blackKingPosition;
     bool whiteTurn;
+    int fullmoves;
+    int halfmovesNoCaptures;
     bool enpassant = false;
     int enPassantFile;
     piece* createPieceFromChar(char pieceChar, pos position);
-    int whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
-    int blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
+    int whiteQueens, whiteRooks, whiteBishops, whiteKnights , whitePawns ;
+    int blackQueens, blackRooks, blackBishops, blackKnights , blackPawns ;
 public:
     board(bool FullBoardInit);
     // true for normal game -> initialized full board
 
     bool isWhiteTurn();
     void switchTurns();
+   
     void minusPiece(char pieceType,bool isWhite);
     void plusPiece(char pieceType,bool isWhite);
-
+    
+    void minusFullMove();
+    void plusFullMove();
+    void minusHalfMoveNoCaptures();
+    void plusHalfMoveNoCaptures();
+    void resetHalfMovesNoCaptures();
+    
     void setAt(pos position,piece* Pointer2piece);
     piece* getAt(pos position);
     vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
@@ -98,7 +107,9 @@ public:
     bool isStalemate (bool isWhiteTurn);
     bool isTrifoldDraw ();
     bool isInsufficientMaterial();
-    
+    bool is50MoveDraw();
+    bool is75MoveDraw();
+
     void printBoardW();
     void printBoardB();
 };

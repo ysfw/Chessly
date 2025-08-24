@@ -193,9 +193,33 @@ void board::addHash(uint64_t newHash)
     }
 }
 
+
+void board::minusFullMove()
+{
+    fullmoves--;
+}
+void board::plusFullMove()
+{
+    fullmoves++;
+}
+void board::minusHalfMoveNoCaptures()
+{
+    halfmovesNoCaptures--;
+}
+void board::plusHalfMoveNoCaptures()
+{
+    halfmovesNoCaptures++;
+}
+
+void board::resetHalfMovesNoCaptures()
+{
+    halfmovesNoCaptures=0;
+}
+
 board::board(bool FullBoardInit)
     : Board(8, vector<piece *>(8, nullptr))
 {
+    fullmoves=0, halfmovesNoCaptures =0;
     whiteTurn = true;
     enPassantFile = NO_FILE;
     initZobrist();
@@ -212,8 +236,13 @@ board::board(bool FullBoardInit)
                 }
             }
         }
-        int whiteQueens = 2, whiteRooks = 2, whiteBishops = 2, whiteKnights = 2, whitePawns = 8;
-        int blackQueens = 2, blackRooks = 2, blackBishops = 2, blackKnights = 2, blackPawns = 8;
+        whiteQueens = 2, whiteRooks = 2, whiteBishops = 2, whiteKnights = 2, whitePawns = 8;
+        blackQueens = 2, blackRooks = 2, blackBishops = 2, blackKnights = 2, blackPawns = 8;
+    }
+    else
+    {
+            whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
+            blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
     }
     uint64_t inititalHash = calculateintitialZobristHash();
     this->addHash(inititalHash);
@@ -693,6 +722,7 @@ char getPromotionPiece()
     cin >> piece;
     return tolower(piece);
 }
+
 bool board::isPinned(piece *p, pos newPosition)
 {
     pos oldPosition = p->getPosition();
@@ -836,10 +866,18 @@ bool board::isInsufficientMaterial() {
     }
     
 
-
-    // If none of the draw conditions were met, there is sufficient material.
     return false;
 }
+
+bool board:: is50MoveDraw()
+{
+    return (halfmovesNoCaptures >=50);
+}
+bool board:: is75MoveDraw()
+{
+    return (halfmovesNoCaptures == 75);
+}
+    
 
 void board ::printBoardB()
 {
@@ -934,15 +972,35 @@ void Normalgame ::run()
         
         if (board.isCheckmate(whiteTurn))
         {
-            cout << "Black Wins By Checkmate" << endl;
+            cout << "Black Wins By Checkmate." << endl;
+            return;
+        }
+        else if(board.isCheckmate(!whiteTurn))
+        {
+            cout << "White Wins By Checkmate." << endl;
             return;
         }
         else if (board.isStalemate(whiteTurn))
         {
-            cout << "Draw By Stalemate" << endl;
+            cout << "Draw By Stalemate." << endl;
             return;
         }
-
+        else if(board.is75MoveDraw())
+        {
+            cout << "Draw By 75 move rule." << endl;
+            return;
+        }
+        else if (board.is50MoveDraw())
+        {
+            cout << "Do you want to claim draw By 50 move rule? (y/n) : " << endl;
+            char choice;
+            cin>>choice;
+            if(tolower(choice)=='y')
+            {
+                cout << "Draw By 50 move rule." << endl;
+                return;
+            }
+        }
         whiteTurn ? board.printBoardW() : board.printBoardB();
         string input;
         cout << "Select a piece (e.g., e2 e4) or type exit: ";
