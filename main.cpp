@@ -13,7 +13,6 @@ int main (){
 
 
 /*
-- 50/75 move rules
 - fixing notation to the PGN
 - FEN
 - saving and loading positions
