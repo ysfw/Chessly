@@ -104,6 +104,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     if (isCapture && !isEnPassantCapture)
     {
         Board.resetHalfMovesNoCaptures();
+        if(movingPieceColor) Board.setWhitecaptured();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         char capturedPieceType = targetOnNextSquare->getType();
         int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
@@ -132,6 +133,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     else if (isEnPassantCapture)
     {
         Board.resetHalfMovesNoCaptures();
+        if(movingPieceColor) Board.setWhitecaptured();
         Board.minusPiece('p',!movingPieceColor);
         pos capturedPawnPos = {this->position.first, newPosition.second};
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
@@ -153,7 +155,8 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     // --- BRANCH 3: Castling Move ---
     else if (isCastle)
     {
-        Board.plusHalfMoveNoCaptures();
+        if(movingPieceColor) Board.resetWhitecaptured();
+        else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         bool kingSide = (newPosition.second > position.second);
         player->addMove({{this, kingSide ? "0-0" : "0-0-0"}, false});
@@ -202,9 +205,15 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             char capturedPieceType = targetOnNextSquare->getType();
             int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
             Board.minusPiece(capturedPieceType,capturedPieceColor);
+            if(movingPieceColor) Board.setWhitecaptured();
+            Board.resetHalfMovesNoCaptures();
             newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
         }
-        else Board.plusHalfMoveNoCaptures();
+        else 
+        {
+            if(movingPieceColor) Board.resetWhitecaptured();
+            else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
+        }
         newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
         player->addMove({{this, moveTOstring(position)}, false});
         Board.setAt(newPosition, promotedPiece);
@@ -214,9 +223,11 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.resetEnPassantFile();
     }
 
-    // --- BRANCH 5: Standard Non-Capture Move ---
+    // --- BRANCH 5: Non-Capture Move ---
     else
     {
+        if(movingPieceColor) Board.resetWhitecaptured();
+        else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
@@ -238,7 +249,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         }
         else
         {
-            Board.plusHalfMoveNoCaptures();
             Board.resetEnpassant();
             Board.resetEnPassantFile();
         }
@@ -272,5 +282,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     Board.setPreviousHash(newHash);
     return true;
 
-    if(!Board.isWhiteTurn()) Board.plusFullMove();
+    if(!Board.isWhiteTurn())
+        Board.plusFullMove();
+
 }

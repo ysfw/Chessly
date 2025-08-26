@@ -9,6 +9,8 @@ string moveTOstring(pos Position);
 pos stringTOmove(string move);
 char getPromotionPiece();
 void clearScreen();
+vector<string> splitFEN (string FEN);
+bool isValidFEN (string FEN);
 
 
 struct AttackInfo {
@@ -24,7 +26,7 @@ class board
 {
 private:
     vector<vector<piece*>> Board;
-    const std::string layout[8] = {
+    const string layout[8] = {
         "RNBQKBNR",
         "PPPPPPPP",
         "........",
@@ -57,17 +59,22 @@ private:
     int fullmoves;
     int halfmovesNoCaptures;
     bool enpassant = false;
+    bool didWhiteCapture =false; 
     int enPassantFile;
     piece* createPieceFromChar(char pieceChar, pos position);
     int whiteQueens, whiteRooks, whiteBishops, whiteKnights , whitePawns ;
     int blackQueens, blackRooks, blackBishops, blackKnights , blackPawns ;
 public:
-    board(bool FullBoardInit);
+    board();
     // true for normal game -> initialized full board
+    board(string FEN);
 
     bool isWhiteTurn();
     void switchTurns();
-   
+    void setWhitecaptured();
+    void resetWhitecaptured();
+    bool DidWhitecapture();
+
     void minusPiece(char pieceType,bool isWhite);
     void plusPiece(char pieceType,bool isWhite);
     
@@ -109,6 +116,8 @@ public:
     bool isInsufficientMaterial();
     bool is50MoveDraw();
     bool is75MoveDraw();
+
+    
 
     void printBoardW();
     void printBoardB();

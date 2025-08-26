@@ -60,13 +60,15 @@ public:
 class king : public piece
 {
 private: 
-    bool canCastle;
+    bool canCastle, canKingside, canQueenside ;
 public:
     king(bool White, pair<int, int> startingPosition);
     void checkMoves(board &Board, pos position)override;
     bool canKingCastle();
     bool canKingsideCastle (board &Board);
     bool canQueensideCastle (board &Board);
+    void setKingsideCastle ();
+    void setQueensideCastle();
     void resetCastling();
     bool isCheck(board &Board,pos targetSquare);
 };

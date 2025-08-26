@@ -35,17 +35,22 @@ piece *board::createPieceFromChar(char pieceChar, pos position)
     switch (tolower(pieceChar))
     {
     case 'r':
+        isWhite? whiteRooks++ : blackRooks++;
         return new rook(isWhite, position);
     case 'n':
+        isWhite? whiteKnights++ : blackKnights++;
         return new Knight(isWhite, position);
     case 'b':
+        isWhite? whiteBishops++ : blackBishops++;
         return new bishop(isWhite, position);
     case 'q':
+        isWhite? whiteQueens++ : blackQueens++;
         return new queen(isWhite, position);
     case 'k':
         isWhite ? whiteKingPosition = position : blackKingPosition = position;
         return new king(isWhite, position);
     case 'p':
+        isWhite? whitePawns++ : blackPawns++;
         return new pawn(isWhite, position);
     default:
         return nullptr;
@@ -59,6 +64,20 @@ bool board::isWhiteTurn()
 void board::switchTurns()
 {
     whiteTurn = !whiteTurn;
+}
+void board:: setWhitecaptured()
+{
+    didWhiteCapture = true;
+}
+
+void board:: resetWhitecaptured()
+{
+    didWhiteCapture = false;
+}
+
+bool board:: DidWhitecapture()
+{
+    return didWhiteCapture ;
 }
 
 void board::initZobrist()
@@ -216,38 +235,131 @@ void board::resetHalfMovesNoCaptures()
     halfmovesNoCaptures=0;
 }
 
-board::board(bool FullBoardInit)
+board::board()
     : Board(8, vector<piece *>(8, nullptr))
 {
+    whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
+    blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
     fullmoves=0, halfmovesNoCaptures =0;
     whiteTurn = true;
     enPassantFile = NO_FILE;
     initZobrist();
-    if (FullBoardInit)
+    for (int rank = 0; rank < 8; rank++)
     {
-        for (int i = 0; i < 8; i++)
+        for (int file = 0; file < 8; file++)
         {
-            for (int j = 0; j < 8; j++)
+            char pieceChar = layout[rank][file];
+            if (pieceChar != '.')
             {
-                char pieceChar = layout[i][j];
-                if (pieceChar != '.')
-                {
-                    Board[i][j] = createPieceFromChar(pieceChar, {i, j});
-                }
+                Board[rank][file] = createPieceFromChar(pieceChar, {rank, file});
             }
         }
-        whiteQueens = 2, whiteRooks = 2, whiteBishops = 2, whiteKnights = 2, whitePawns = 8;
-        blackQueens = 2, blackRooks = 2, blackBishops = 2, blackKnights = 2, blackPawns = 8;
     }
-    else
-    {
-            whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
-            blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
-    }
+
     uint64_t inititalHash = calculateintitialZobristHash();
     this->addHash(inititalHash);
     PreviousHash=inititalHash;
     
+}
+
+vector<string> splitFEN (string FEN)
+{
+    vector<string> res (6);
+    // {pieces , turn , castling , enpassant , halfmoves , fullmoves}
+
+    stringstream ss(FEN);
+    string t; int i=0;
+
+    while (getline(ss, t, ' '))
+    {
+        res[i]=t;
+        i++;
+    }
+    return res;
+}
+
+bool isValidFEN (string FEN)
+{
+    regex e ("^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+\s+[wb]\s+([KQkq-]{1,4})\s+([a-h][36]|-)\s+(\d+)\s+(\d+)$");
+    if (!regex_match(FEN, e)) return false;
+
+    //tbc :: I need to check for logical stuff like you only can have 1 king each , pawns cannot be on the first or last rank 
+    //       , incorrect rank counts, checking if castling and en passant make sense given the positions of the pieces on the board
+    //       and also that the side who's not it's turn cannot be in check.
+
+
+}
+
+board:: board (string FEN)
+:Board(8, vector<piece *>(8, nullptr))
+{
+    initZobrist();
+
+    whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
+    blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
+
+    vector<string> splitFENstrs = splitFEN(FEN); 
+        
+
+    int rank = 7 , file = 0 ;
+    while (rank>=0)
+    {
+        for (char a : splitFENstrs[0])
+        {
+            if(isalnum(a))
+                {
+                    file+=atoi(&a);
+                    continue;
+                }
+                else if(a == '/')
+                {
+                    file=0;
+                    rank--;
+                    continue;
+                }
+                else{
+                    Board[rank][file] = createPieceFromChar(a, {rank, file});
+                }
+        }
+
+    }
+    
+    if(splitFENstrs[1][0] == 'w') whiteTurn = true;
+    else whiteTurn = false;
+
+    for (char a : splitFENstrs[2])
+    {
+        switch (a)
+        {
+        case 'K':
+            king* wk = dynamic_cast <king*> (this->getAt(whiteKingPosition));
+            wk->setKingsideCastle();
+            break;
+        case 'Q':
+            king* wk = dynamic_cast <king*> (this->getAt(whiteKingPosition));
+            wk->setQueensideCastle();
+            break;
+        case 'k':
+            king* bk = dynamic_cast <king*> (this->getAt(blackKingPosition));
+            bk->setKingsideCastle();
+            break;
+        case 'q':
+            king* bk = dynamic_cast <king*> (this->getAt(blackKingPosition));
+            bk->setQueensideCastle();
+            break;
+        
+        default:
+            break;
+        }
+    }
+
+    if(splitFENstrs[3] != "-") this->enPassantFile = stringTOmove(splitFENstrs[3]).second;
+    else enPassantFile=NO_FILE;
+
+
+    this->halfmovesNoCaptures= stoi(splitFENstrs[4]);
+    this->fullmoves= stoi(splitFENstrs[5]);
+
 }
 
 void board:: minusPiece(char pieceType,bool isWhite)
@@ -871,11 +983,11 @@ bool board::isInsufficientMaterial() {
 
 bool board:: is50MoveDraw()
 {
-    return (halfmovesNoCaptures >=100);
+    return (halfmovesNoCaptures >=50);
 }
 bool board:: is75MoveDraw()
 {
-    return (halfmovesNoCaptures == 150);
+    return (halfmovesNoCaptures == 75);
 }
     
 
@@ -947,7 +1059,7 @@ Normalgame::~Normalgame()
 
 void Normalgame ::run()
 {
-    board board(true);
+    board board;
     player White = player(true);
     player Black = player(false);
 

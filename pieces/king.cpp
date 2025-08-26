@@ -7,6 +7,7 @@ king::king(bool isWhite, pair<int, int> startingPosition)
     setType('k');
     if((isWhite && startingPosition == pair<int,int>{0,4}) || (!isWhite && startingPosition == pair<int,int>{7,4})) canCastle = true;
     else canCastle = false;
+    canQueenside = false , canKingside = false;
 }
 
 bool king::isCheck(board &Board, pos targetSquare)
@@ -32,6 +33,14 @@ bool king::canKingCastle(){
     return canCastle;
 }
 
+void king:: setKingsideCastle ()
+{
+    canKingside = true;
+}
+void king:: setQueensideCastle()
+{
+    canQueenside = true;
+}
 
 bool king:: canKingsideCastle (board &Board){
     if(this->canCastle){
@@ -40,12 +49,12 @@ bool king:: canKingsideCastle (board &Board){
         for (size_t i =1; i < 3; i++)
         {
             if(Board.getAt({firstCoord,secondCoord+i}) != nullptr || !Board.AttackedBy({firstCoord,secondCoord+i},this->isWhite()).empty())
-                return false;
+                canKingside= false;
         }
         rook* r = dynamic_cast<rook*>(Board.getAt({firstCoord,secondCoord+3}));
-        if(r!= nullptr && r->canRookCastle()) return true;
+        if(r!= nullptr && r->canRookCastle()) canKingside=true;
     }
-    return false;
+    return canKingside;
 }
 
 bool king:: canQueensideCastle (board &Board){
@@ -55,12 +64,12 @@ if(this->canCastle){
         for (size_t i =1; i < 4; i++)
         {
             if(Board.getAt({firstCoord,secondCoord-i}) != nullptr || !Board.AttackedBy({firstCoord,secondCoord-i},this->isWhite()).empty())
-                return false;
+                canQueenside = false;
         }
         rook* r = dynamic_cast<rook*>(Board.getAt({firstCoord,secondCoord-4}));
-        if(r!= nullptr && r->canRookCastle()) return true;
+        if(r!= nullptr && r->canRookCastle()) canQueenside = true;
     }
-    return false;
+    return canQueenside;
 }
 
 
