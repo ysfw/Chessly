@@ -35,22 +35,22 @@ piece *board::createPieceFromChar(char pieceChar, pos position)
     switch (tolower(pieceChar))
     {
     case 'r':
-        isWhite? whiteRooks++ : blackRooks++;
+        isWhite ? whiteRooks++ : blackRooks++;
         return new rook(isWhite, position);
     case 'n':
-        isWhite? whiteKnights++ : blackKnights++;
+        isWhite ? whiteKnights++ : blackKnights++;
         return new Knight(isWhite, position);
     case 'b':
-        isWhite? whiteBishops++ : blackBishops++;
+        isWhite ? whiteBishops++ : blackBishops++;
         return new bishop(isWhite, position);
     case 'q':
-        isWhite? whiteQueens++ : blackQueens++;
+        isWhite ? whiteQueens++ : blackQueens++;
         return new queen(isWhite, position);
     case 'k':
         isWhite ? whiteKingPosition = position : blackKingPosition = position;
         return new king(isWhite, position);
     case 'p':
-        isWhite? whitePawns++ : blackPawns++;
+        isWhite ? whitePawns++ : blackPawns++;
         return new pawn(isWhite, position);
     default:
         return nullptr;
@@ -65,19 +65,19 @@ void board::switchTurns()
 {
     whiteTurn = !whiteTurn;
 }
-void board:: setWhitecaptured()
+void board::setWhitecaptured()
 {
     didWhiteCapture = true;
 }
 
-void board:: resetWhitecaptured()
+void board::resetWhitecaptured()
 {
     didWhiteCapture = false;
 }
 
-bool board:: DidWhitecapture()
+bool board::DidWhitecapture()
 {
-    return didWhiteCapture ;
+    return didWhiteCapture;
 }
 
 void board::initZobrist()
@@ -106,7 +106,7 @@ void board::initZobrist()
 uint64_t board ::calculateintitialZobristHash()
 {
     uint64_t hash = 0;
-    hash^=WhiteTurnkey;
+    hash ^= WhiteTurnkey;
     enum PieceType
     {
         PAWN,
@@ -131,7 +131,6 @@ uint64_t board ::calculateintitialZobristHash()
                 uint64_t pieceHash = zobristTable[pieceType.at(type)][color][8 * i + j];
                 hash ^= pieceHash;
 
-                
                 if (king *k = dynamic_cast<king *>(piece))
                 {
                     if (k->isWhite())
@@ -151,9 +150,8 @@ uint64_t board ::calculateintitialZobristHash()
                 }
             }
         }
-
     }
-    
+
     int epFile = this->getEnPassantFile();
     if (epFile != NO_FILE)
     {
@@ -204,14 +202,14 @@ uint64_t board::getenPassantFileKey(int file)
 void board::addHash(uint64_t newHash)
 {
     if (this->zobristHistory.find(newHash) != zobristHistory.end())
-        {zobristHistory[newHash]++;
+    {
+        zobristHistory[newHash]++;
     }
     else
     {
         this->zobristHistory.insert({newHash, 1});
     }
 }
-
 
 void board::minusFullMove()
 {
@@ -232,236 +230,270 @@ void board::plusHalfMoveNoCaptures()
 
 void board::resetHalfMovesNoCaptures()
 {
-    halfmovesNoCaptures=0;
+    halfmovesNoCaptures = 0;
 }
 
-board::board()
+board::board(bool fullBoard)
     : Board(8, vector<piece *>(8, nullptr))
 {
     whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
     blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
-    fullmoves=0, halfmovesNoCaptures =0;
+    fullmoves = 0, halfmovesNoCaptures = 0;
     whiteTurn = true;
     enPassantFile = NO_FILE;
     initZobrist();
-    for (int rank = 0; rank < 8; rank++)
+    if (fullBoard)
     {
-        for (int file = 0; file < 8; file++)
+        for (int rank = 0; rank < 8; rank++)
         {
-            char pieceChar = layout[rank][file];
-            if (pieceChar != '.')
+            for (int file = 0; file < 8; file++)
             {
-                Board[rank][file] = createPieceFromChar(pieceChar, {rank, file});
+                char pieceChar = layout[rank][file];
+                if (pieceChar != '.')
+                {
+                    Board[rank][file] = createPieceFromChar(pieceChar, {rank, file});
+                }
             }
         }
     }
-
     uint64_t inititalHash = calculateintitialZobristHash();
     this->addHash(inititalHash);
-    PreviousHash=inititalHash;
-    
+    PreviousHash = inititalHash;
 }
 
-vector<string> splitFEN (string FEN)
+vector<string> splitFEN(string FEN)
 {
-    vector<string> res (6);
+    vector<string> res(6);
     // {pieces , turn , castling , enpassant , halfmoves , fullmoves}
 
     stringstream ss(FEN);
-    string t; int i=0;
+    string t;
+    int i = 0;
 
     while (getline(ss, t, ' '))
     {
-        res[i]=t;
+        res[i] = t;
         i++;
     }
     return res;
 }
 
-bool isValidFEN (string FEN)
+bool isValidFEN(string FEN)
 {
-    regex e ("^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+\s+[wb]\s+([KQkq-]{1,4})\s+([a-h][36]|-)\s+(\d+)\s+(\d+)$");
-    if (!regex_match(FEN, e)) return false;
 
-    //tbc :: I need to check for logical stuff like you only can have 1 king each , pawns cannot be on the first or last rank 
-    //       , incorrect rank counts, checking if castling and en passant make sense given the positions of the pieces on the board
-    //       and also that the side who's not it's turn cannot be in check.
-
-
+    // tbc :: I need to check for logical stuff like you only can have 1 king each , pawns cannot be on the first or last rank //done
+    //        , incorrect rank counts //done , checking if castling and en passant make sense given the positions of the pieces on the board
+    //        and also that the side who's not it's turn cannot be in check.
 }
 
-board:: board (string FEN)
-:Board(8, vector<piece *>(8, nullptr))
+optional<board> board::boardFromFEN(string FEN)
 {
-    initZobrist();
+    regex e("^([rnbqkpRNBQKP1-8]+\\/){7}[rnbqkpRNBQKP1-8]+\\s+[wb]\\s+([KQkq-]{1,4})\\s+([a-h][36]|-)\\s+(\\d+)\\s+(\\d+)$");
+    if (!regex_match(FEN, e))
+        return nullopt;
 
-    whiteQueens = 0, whiteRooks = 0, whiteBishops = 0, whiteKnights = 0, whitePawns = 0;
-    blackQueens = 0, blackRooks = 0, blackBishops = 0, blackKnights = 0, blackPawns = 0;
+    board Board(false);
 
-    vector<string> splitFENstrs = splitFEN(FEN); 
-        
-
-    int rank = 7 , file = 0 ;
-    while (rank>=0)
+    vector<string> splitFENstrs = splitFEN(FEN);
+    bool loadedwhiteKing = false, loadedblackKing = false;
+    int rank = 7, file = 0;
+    for (char a : splitFENstrs[0])
     {
-        for (char a : splitFENstrs[0])
+        if (file == 8)
+            break;
+        if (file > 7 || Board.whitePawns > 8 || Board.blackPawns > 8)
+            return nullopt;
+
+        if (isdigit(a))
         {
-            if(isalnum(a))
-                {
-                    file+=atoi(&a);
-                    continue;
-                }
-                else if(a == '/')
-                {
-                    file=0;
-                    rank--;
-                    continue;
-                }
-                else{
-                    Board[rank][file] = createPieceFromChar(a, {rank, file});
-                }
+            file += (a - '0');
+            continue;
         }
+        else if (a == '/')
+        {
+            if (file != 8)
+                return nullopt;
+            file = 0;
+            rank--;
+            continue;
+        }
+        else
+        {
+            if ((a == 'k' && loadedblackKing) || (a == 'K' && loadedwhiteKing))
+                return nullopt;
+            else if ((a == 'k' && !loadedblackKing))
+                loadedblackKing = true;
+            else if ((a == 'K' && !loadedwhiteKing))
+                loadedwhiteKing = true;
 
+            if ((a == 'p' || a == 'P') && (rank == 7 || rank == 0))
+                return nullopt;
+            Board.setAt({rank, file}, Board.createPieceFromChar(a, {rank, file}));
+            file++;
+        }
     }
-    
-    if(splitFENstrs[1][0] == 'w') whiteTurn = true;
-    else whiteTurn = false;
 
+    if (splitFENstrs[1][0] == 'w')
+    {
+        if (!Board.AttackedBy(Board.blackKingPosition, false).empty())
+            return nullopt;
+        Board.whiteTurn = true;
+    }
+    else
+    {
+        if (!Board.AttackedBy(Board.whiteKingPosition, true).empty())
+            return nullopt;
+        Board.whiteTurn = false;
+    }
+
+    king *wk = dynamic_cast<king *>(Board.getAt(Board.whiteKingPosition));
+    king *bk = dynamic_cast<king *>(Board.getAt(Board.blackKingPosition));
     for (char a : splitFENstrs[2])
     {
         switch (a)
         {
         case 'K':
-            king* wk = dynamic_cast <king*> (this->getAt(whiteKingPosition));
             wk->setKingsideCastle();
+            if (!wk->canKingsideCastle(Board))
+                return nullopt;
             break;
         case 'Q':
-            king* wk = dynamic_cast <king*> (this->getAt(whiteKingPosition));
             wk->setQueensideCastle();
+            if (!wk->canQueensideCastle(Board))
+                return nullopt;
             break;
         case 'k':
-            king* bk = dynamic_cast <king*> (this->getAt(blackKingPosition));
             bk->setKingsideCastle();
+            if (!bk->canKingsideCastle(Board))
+                return nullopt;
             break;
         case 'q':
-            king* bk = dynamic_cast <king*> (this->getAt(blackKingPosition));
             bk->setQueensideCastle();
+            if (!bk->canQueensideCastle(Board))
+                return nullopt;
             break;
-        
+
         default:
             break;
         }
     }
 
-    if(splitFENstrs[3] != "-") this->enPassantFile = stringTOmove(splitFENstrs[3]).second;
-    else enPassantFile=NO_FILE;
+    if (splitFENstrs[3] != "-")
+    {
+        pos newenpassantpos = stringTOmove(splitFENstrs[3]);
+        if((newenpassantpos.first ==  5 && !Board.whiteTurn) || (newenpassantpos.first ==  2 && Board.whiteTurn)) return nullopt;
+        if (Board.getAt(newenpassantpos) != nullptr || Board.getAt({newenpassantpos.first-1, newenpassantpos.second}) != nullptr)
+            return nullopt;
 
+        Board.enPassantFile = newenpassantpos.second;
+    }
+    else
+        Board.enPassantFile = NO_FILE;
 
-    this->halfmovesNoCaptures= stoi(splitFENstrs[4]);
-    this->fullmoves= stoi(splitFENstrs[5]);
+    Board.halfmovesNoCaptures = stoi(splitFENstrs[4]);
+    Board.fullmoves = stoi(splitFENstrs[5]);
 
+    return Board;
 }
 
-void board:: minusPiece(char pieceType,bool isWhite)
+void board::minusPiece(char pieceType, bool isWhite)
 {
-    if(isWhite)
+    if (isWhite)
     {
         switch (pieceType)
-            {
-            case 'q':
-                whiteQueens--;
-                break;
-            case 'r':
-                whiteRooks--;
-                break;
-            case 'b':
-                whiteBishops--;
-                break;
-            case 'n':
-                whiteKnights--;
-                break;
-            case 'p':
-                whitePawns--;
-                break;    
-            default:
-                break;
-            }
+        {
+        case 'q':
+            whiteQueens--;
+            break;
+        case 'r':
+            whiteRooks--;
+            break;
+        case 'b':
+            whiteBishops--;
+            break;
+        case 'n':
+            whiteKnights--;
+            break;
+        case 'p':
+            whitePawns--;
+            break;
+        default:
+            break;
+        }
     }
     else
     {
         switch (pieceType)
-            {
-            case 'q':
-                blackQueens--;
-                break;
-            case 'r':
-                blackRooks--;
-                break;
-            case 'b':
-                blackBishops--;
-                break;
-            case 'n':
-                blackKnights--;
-                break;
-            case 'p':
-                blackPawns--;
-                break;    
-            default:
-                break;
-            }
+        {
+        case 'q':
+            blackQueens--;
+            break;
+        case 'r':
+            blackRooks--;
+            break;
+        case 'b':
+            blackBishops--;
+            break;
+        case 'n':
+            blackKnights--;
+            break;
+        case 'p':
+            blackPawns--;
+            break;
+        default:
+            break;
+        }
     }
-
 }
 
-void board:: plusPiece(char pieceType,bool isWhite)
+void board::plusPiece(char pieceType, bool isWhite)
 {
-    if(isWhite)
+    if (isWhite)
     {
         switch (pieceType)
-            {
-            case 'q':
-                whiteQueens++;
-                break;
-            case 'r':
-                whiteRooks++;
-                break;
-            case 'b':
-                whiteBishops++;
-                break;
-            case 'n':
-                whiteKnights++;
-                break;
-            case 'p':
-                whitePawns++;
-                break;    
-            default:
-                break;
-            }
+        {
+        case 'q':
+            whiteQueens++;
+            break;
+        case 'r':
+            whiteRooks++;
+            break;
+        case 'b':
+            whiteBishops++;
+            break;
+        case 'n':
+            whiteKnights++;
+            break;
+        case 'p':
+            whitePawns++;
+            break;
+        default:
+            break;
+        }
     }
     else
     {
         switch (pieceType)
-            {
-            case 'q':
-                blackQueens++;
-                break;
-            case 'r':
-                blackRooks++;
-                break;
-            case 'b':
-                blackBishops++;
-                break;
-            case 'n':
-                blackKnights++;
-                break;
-            case 'p':
-                blackPawns++;
-                break;    
-            default:
-                break;
-            }
+        {
+        case 'q':
+            blackQueens++;
+            break;
+        case 'r':
+            blackRooks++;
+            break;
+        case 'b':
+            blackBishops++;
+            break;
+        case 'n':
+            blackKnights++;
+            break;
+        case 'p':
+            blackPawns++;
+            break;
+        default:
+            break;
+        }
     }
-
 }
 
 piece *board ::getAt(pos position)
@@ -930,66 +962,72 @@ bool board::isTrifoldDraw()
     return false;
 }
 
-
-bool board::isInsufficientMaterial() {
+bool board::isInsufficientMaterial()
+{
 
     // If any player has a Queen, Rook, or Pawn, it's not a draw.
-    if (whiteQueens > 0 || whiteRooks > 0 || whitePawns > 0) return false;
-    if (blackQueens > 0 || blackRooks > 0 || blackPawns > 0) return false;
-
+    if (whiteQueens > 0 || whiteRooks > 0 || whitePawns > 0)
+        return false;
+    if (blackQueens > 0 || blackRooks > 0 || blackPawns > 0)
+        return false;
 
     int totalBishops = whiteBishops + blackBishops;
     int totalKnights = whiteKnights + blackKnights;
 
     // King vs King, King + Bishop vs King, or King + Knight vs King
-    if (totalBishops <= 1 && totalKnights <= 1) {
+    if (totalBishops <= 1 && totalKnights <= 1)
+    {
         return true;
     }
 
     // King + Two Knights vs King
-    if (whiteKnights == 2 && blackBishops == 0 && blackKnights == 0) return true;
-    if (blackKnights == 2 && whiteBishops == 0 && whiteKnights == 0) return true;
+    if (whiteKnights == 2 && blackBishops == 0 && blackKnights == 0)
+        return true;
+    if (blackKnights == 2 && whiteBishops == 0 && whiteKnights == 0)
+        return true;
 
     // King + Bishop vs King + Bishop on same-colored squares
     if (blackBishops == 1 && whiteBishops == 1 && whiteKnights == 0 && blackKnights == 0)
     {
-        bool WhiteBishopOnWhiteSquare=false,BlackBishopOnWhiteSquare=false;
-        int bishopsFound =0;
+        bool WhiteBishopOnWhiteSquare = false, BlackBishopOnWhiteSquare = false;
+        int bishopsFound = 0;
         for (size_t i = 0; i < 8; i++)
         {
-            if(bishopsFound == 2) break;
+            if (bishopsFound == 2)
+                break;
             for (size_t j = 0; j < 8; j++)
             {
-                if(bishopsFound == 2) break;
-                piece* target = this->getAt({i,j});
-                if(target==nullptr) continue;
-                else if(bishop* b = dynamic_cast<bishop*> (target)) 
+                if (bishopsFound == 2)
+                    break;
+                piece *target = this->getAt({i, j});
+                if (target == nullptr)
+                    continue;
+                else if (bishop *b = dynamic_cast<bishop *>(target))
                 {
                     bishopsFound++;
                     bool isWhite = b->isWhite();
-                    if(isWhite&&((i + j) % 2 != 0)) WhiteBishopOnWhiteSquare = true;
-                    if(!isWhite&&((i + j) % 2 != 0)) BlackBishopOnWhiteSquare = true;
+                    if (isWhite && ((i + j) % 2 != 0))
+                        WhiteBishopOnWhiteSquare = true;
+                    if (!isWhite && ((i + j) % 2 != 0))
+                        BlackBishopOnWhiteSquare = true;
                 }
             }
-            
         }
-        if(WhiteBishopOnWhiteSquare == BlackBishopOnWhiteSquare) return true;
-        
+        if (WhiteBishopOnWhiteSquare == BlackBishopOnWhiteSquare)
+            return true;
     }
-    
 
     return false;
 }
 
-bool board:: is50MoveDraw()
+bool board::is50MoveDraw()
 {
-    return (halfmovesNoCaptures >=50);
+    return (halfmovesNoCaptures >= 50);
 }
-bool board:: is75MoveDraw()
+bool board::is75MoveDraw()
 {
     return (halfmovesNoCaptures == 75);
 }
-    
 
 void board ::printBoardB()
 {
@@ -1059,7 +1097,7 @@ Normalgame::~Normalgame()
 
 void Normalgame ::run()
 {
-    board board;
+    board board(true);
     player White = player(true);
     player Black = player(false);
 
@@ -1068,7 +1106,7 @@ void Normalgame ::run()
     {
         bool whiteTurn = board.isWhiteTurn();
         clearScreen();
-        
+
         // //debug zobrist History
         //     std::ofstream outputFile("output.txt", std::ios::app);
         //     if (!outputFile.is_open()) {
@@ -1081,13 +1119,13 @@ void Normalgame ::run()
         //     std::cout.rdbuf(originalCoutBuffer);
         //     outputFile.close();
         // //endofdebug
-        
+
         if (board.isCheckmate(whiteTurn))
         {
             cout << "Black Wins By Checkmate." << endl;
             return;
         }
-        else if(board.isCheckmate(!whiteTurn))
+        else if (board.isCheckmate(!whiteTurn))
         {
             cout << "White Wins By Checkmate." << endl;
             return;
@@ -1097,7 +1135,7 @@ void Normalgame ::run()
             cout << "Draw By Stalemate." << endl;
             return;
         }
-        else if(board.is75MoveDraw())
+        else if (board.is75MoveDraw())
         {
             cout << "Draw By 75 move rule." << endl;
             return;
@@ -1106,8 +1144,8 @@ void Normalgame ::run()
         {
             cout << "Do you want to claim draw By 50 move rule? (y/n) : " << endl;
             char choice;
-            cin>>choice;
-            if(tolower(choice)=='y')
+            cin >> choice;
+            if (tolower(choice) == 'y')
             {
                 cout << "Draw By 50 move rule." << endl;
                 return;

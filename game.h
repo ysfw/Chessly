@@ -65,9 +65,9 @@ private:
     int whiteQueens, whiteRooks, whiteBishops, whiteKnights , whitePawns ;
     int blackQueens, blackRooks, blackBishops, blackKnights , blackPawns ;
 public:
-    board();
+    board(bool fullBoard);
     // true for normal game -> initialized full board
-    board(string FEN);
+    static optional<board> boardFromFEN(string FEN);
 
     bool isWhiteTurn();
     void switchTurns();
