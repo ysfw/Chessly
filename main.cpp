@@ -1,5 +1,6 @@
 //Use g++ -I. -o chess main.cpp game.cpp  pieces/*.cpp to compile
 //chcp 65001
+// valgrind --tool=memcheck --leak-check=yes ./chess
 
 #include "game.h"
 
@@ -59,8 +60,7 @@ int main (){
 
 /*
 - fixing notation to the PGN
-- FEN
-- saving and loading positions
+- saving positions
 - redo/undo moves
 - Refactor and optimize if possible
 - adding the stockfish functionality to play 1 Vs bot and evaluate game

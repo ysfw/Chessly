@@ -10,7 +10,7 @@ pos stringTOmove(string move);
 char getPromotionPiece();
 void clearScreen();
 vector<string> splitFEN (string FEN);
-bool isValidFEN (string FEN);
+
 
 
 struct AttackInfo {
@@ -68,6 +68,8 @@ public:
     board(bool fullBoard);
     // true for normal game -> initialized full board
     static optional<board> boardFromFEN(string FEN);
+
+    // ~board();
 
     bool isWhiteTurn();
     void switchTurns();

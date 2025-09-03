@@ -287,7 +287,6 @@ optional<board> board::boardFromFEN(string FEN)
     }
 
     board Board(false);
-    Board.initZobrist();
     vector<string> splitFENstrs = splitFEN(FEN);
     bool loadedwhiteKing = false, loadedblackKing = false;
     int rank = 7, file = 0;
@@ -446,6 +445,15 @@ optional<board> board::boardFromFEN(string FEN)
     Board.setPreviousHash(inititalHash);
     return Board;
 }
+
+// board::~board()
+// {
+//     for(int i =0 ; i<8;i++)
+//             {
+//                 for(int j =0 ; j<8;j++)
+//                     delete this->getAt({i,j});
+//             }
+// }
 
 void board::minusPiece(char pieceType, bool isWhite)
 {

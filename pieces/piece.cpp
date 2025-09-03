@@ -185,17 +185,30 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         switch (promotionPieceType)
         {
             case 'q':
-            promotedPiece = new queen(this->White, newPosition);
-            break;
+            {
+                promotedPiece = new queen(this->White, newPosition);
+                Board.setAt(newPosition,promotedPiece);
+                break;
+            }
+
             case 'r':
-            promotedPiece = new rook(this->White, newPosition);
-            break;
+            {
+                promotedPiece = new rook(this->White, newPosition);
+                Board.setAt(newPosition,promotedPiece);
+                break;
+            }
             case 'b':
-            promotedPiece = new bishop(this->White, newPosition);
-            break;
+            {
+                promotedPiece = new bishop(this->White, newPosition);
+                Board.setAt(newPosition,promotedPiece);
+                break;
+            }
             case 'n':
-            promotedPiece = new Knight(this->White, newPosition);
-            break;
+            {
+                promotedPiece = new Knight(this->White, newPosition);
+                Board.setAt(newPosition,promotedPiece);
+                break;
+            }
             default:
             break;
         }
