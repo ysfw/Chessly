@@ -69,6 +69,8 @@ public:
     bool canQueensideCastle (board &Board);
     void setKingsideCastle ();
     void setQueensideCastle();
+    void resetKingsideCastle ();
+    void resetQueensideCastle();
     void resetCastling();
     bool isCheck(board &Board,pos targetSquare);
 };

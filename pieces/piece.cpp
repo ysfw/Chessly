@@ -137,12 +137,11 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.minusPiece('p',!movingPieceColor);
         pos capturedPawnPos = {this->position.first, newPosition.second};
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
-        newHash ^= Board.getPiecehash(PAWN, !movingPieceColor, {capturedPawnPos.first, capturedPawnPos.second});
+        newHash ^= Board.getPiecehash('p', !movingPieceColor, capturedPawnPos);
         player->addMove({{this, moveTOstring(position)}, true});
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
 
-        int capturedPawnRow = this->isWhite() ? newPosition.first - 1 : newPosition.first + 1;
         player->addCapture({Board.getAt(capturedPawnPos), moveTOstring(capturedPawnPos)});
         Board.setAt(capturedPawnPos, nullptr);
 
@@ -185,19 +184,19 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.minusPiece('p',this->White);
         switch (promotionPieceType)
         {
-        case 'q':
+            case 'q':
             promotedPiece = new queen(this->White, newPosition);
             break;
-        case 'r':
+            case 'r':
             promotedPiece = new rook(this->White, newPosition);
             break;
-        case 'b':
+            case 'b':
             promotedPiece = new bishop(this->White, newPosition);
             break;
-        case 'n':
+            case 'n':
             promotedPiece = new Knight(this->White, newPosition);
             break;
-        default:
+            default:
             break;
         }
         if (targetOnNextSquare != nullptr)
@@ -265,16 +264,26 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             newHash ^= Board.getcastlingKey(2, k->isWhite());
         }
         k->resetCastling();
+        k->resetKingsideCastle();
+        k->resetQueensideCastle();
         Board.setKingPosition(k->isWhite(), newPosition);
     }
     if (rook *r = dynamic_cast<rook *>(this))
     {
         if (r->canRookCastle())
         {
-            if (oldPosition.second == 7)
+            pos kingpos = Board.getKingPosition(r->isWhite());
+            king *k = dynamic_cast<king *>(Board.getAt(kingpos));
+            if (oldPosition.second == 7 && k->canKingsideCastle(Board))
+            {
                 newHash ^= Board.getcastlingKey(1, r->isWhite());
-            if (oldPosition.second == 0)
+                k->resetKingsideCastle();
+            }
+            if (oldPosition.second == 0 && k->canQueensideCastle(Board))
+            {
                 newHash ^= Board.getcastlingKey(2, r->isWhite());
+                k->resetQueensideCastle();
+            }
         }
         r->resetCastling();
     }
@@ -284,5 +293,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
 
     if(!Board.isWhiteTurn())
         Board.plusFullMove();
+
+    return true;
 
 }

@@ -278,29 +278,30 @@ vector<string> splitFEN(string FEN)
     return res;
 }
 
-bool isValidFEN(string FEN)
-{
-
-    // tbc :: I need to check for logical stuff like you only can have 1 king each , pawns cannot be on the first or last rank //done
-    //        , incorrect rank counts //done , checking if castling and en passant make sense given the positions of the pieces on the board
-    //        and also that the side who's not it's turn cannot be in check.
-}
-
 optional<board> board::boardFromFEN(string FEN)
 {
-    regex e("^([rnbqkpRNBQKP1-8]+\\/){7}[rnbqkpRNBQKP1-8]+\\s+[wb]\\s+([KQkq-]{1,4})\\s+([a-h][36]|-)\\s+(\\d+)\\s+(\\d+)$");
+    regex e(R"(^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+\s[wb]\s(?:K?Q?k?q?|-)\s(?:[a-h][36]|-)\s\d+\s[1-9]\d*$)");
     if (!regex_match(FEN, e))
+    {
         return nullopt;
+    }
 
     board Board(false);
-
+    Board.initZobrist();
     vector<string> splitFENstrs = splitFEN(FEN);
     bool loadedwhiteKing = false, loadedblackKing = false;
     int rank = 7, file = 0;
     for (char a : splitFENstrs[0])
     {
-        if (file == 8)
-            break;
+        if (a == '/')
+        {
+            if (file != 8)
+                return nullopt;
+            file = 0;
+            rank--;
+            continue;
+        }
+
         if (file > 7 || Board.whitePawns > 8 || Board.blackPawns > 8)
             return nullopt;
 
@@ -309,14 +310,8 @@ optional<board> board::boardFromFEN(string FEN)
             file += (a - '0');
             continue;
         }
-        else if (a == '/')
-        {
-            if (file != 8)
-                return nullopt;
-            file = 0;
-            rank--;
-            continue;
-        }
+        else if (file == 8)
+            break;
         else
         {
             if ((a == 'k' && loadedblackKing) || (a == 'K' && loadedwhiteKing))
@@ -331,6 +326,11 @@ optional<board> board::boardFromFEN(string FEN)
             Board.setAt({rank, file}, Board.createPieceFromChar(a, {rank, file}));
             file++;
         }
+    }
+
+    if (rank != 0 || file != 8)
+    {
+        return nullopt; // The FEN did not describe a full 8x8 board.
     }
 
     if (splitFENstrs[1][0] == 'w')
@@ -348,44 +348,92 @@ optional<board> board::boardFromFEN(string FEN)
 
     king *wk = dynamic_cast<king *>(Board.getAt(Board.whiteKingPosition));
     king *bk = dynamic_cast<king *>(Board.getAt(Board.blackKingPosition));
-    for (char a : splitFENstrs[2])
+
+    for (char flag : splitFENstrs[2])
     {
-        switch (a)
+        switch (flag)
         {
         case 'K':
+        {
+            piece *r = Board.getAt({0, 7});
+            if (Board.getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
+            {
+                return nullopt;
+            }
             wk->setKingsideCastle();
-            if (!wk->canKingsideCastle(Board))
-                return nullopt;
             break;
+        }
         case 'Q':
+        {
+            piece *r = Board.getAt({0, 0});
+            if (Board.getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
+            {
+                return nullopt;
+            }
             wk->setQueensideCastle();
-            if (!wk->canQueensideCastle(Board))
-                return nullopt;
             break;
+        }
         case 'k':
+        {
+            piece *r = Board.getAt({7, 7});
+            if (Board.getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
+            {
+                return nullopt;
+            }
             bk->setKingsideCastle();
-            if (!bk->canKingsideCastle(Board))
-                return nullopt;
             break;
+        }
         case 'q':
-            bk->setQueensideCastle();
-            if (!bk->canQueensideCastle(Board))
+        {
+            piece *r = Board.getAt({7, 0});
+            if (Board.getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
+            {
                 return nullopt;
+            }
+            bk->setQueensideCastle();
             break;
-
-        default:
-            break;
+        }
         }
     }
 
     if (splitFENstrs[3] != "-")
     {
         pos newenpassantpos = stringTOmove(splitFENstrs[3]);
-        if((newenpassantpos.first ==  5 && !Board.whiteTurn) || (newenpassantpos.first ==  2 && Board.whiteTurn)) return nullopt;
-        if (Board.getAt(newenpassantpos) != nullptr || Board.getAt({newenpassantpos.first-1, newenpassantpos.second}) != nullptr)
+        if ((newenpassantpos.first == 5 && !Board.whiteTurn) || (newenpassantpos.first == 2 && Board.whiteTurn))
+        {
             return nullopt;
-
+        }
+        if (Board.getAt(newenpassantpos) != nullptr ||
+            (Board.whiteTurn && Board.getAt({newenpassantpos.first + 1, newenpassantpos.second}) != nullptr) ||
+            (!Board.whiteTurn && Board.getAt({newenpassantpos.first - 1, newenpassantpos.second}) != nullptr))
+        {
+            return nullopt;
+        }
         Board.enPassantFile = newenpassantpos.second;
+
+        if (Board.whiteTurn)
+        {
+            pawn *p = dynamic_cast<pawn *>(Board.getAt({newenpassantpos.first - 1, newenpassantpos.second}));
+            if (p != nullptr)
+            {
+                p->setenpassant();
+                Board.setEnpassant();
+            }
+            else
+                return nullopt;
+        }
+
+        if (!Board.whiteTurn)
+        {
+            pawn *p = dynamic_cast<pawn *>(Board.getAt({newenpassantpos.first + 1, newenpassantpos.second}));
+            if (p != nullptr)
+            {
+                p->setenpassant();
+                Board.setEnpassant();
+            }
+            else
+                return nullopt;
+        }
     }
     else
         Board.enPassantFile = NO_FILE;
@@ -393,6 +441,9 @@ optional<board> board::boardFromFEN(string FEN)
     Board.halfmovesNoCaptures = stoi(splitFENstrs[4]);
     Board.fullmoves = stoi(splitFENstrs[5]);
 
+    uint64_t inititalHash = Board.calculateintitialZobristHash();
+    Board.addHash(inititalHash);
+    Board.setPreviousHash(inititalHash);
     return Board;
 }
 
@@ -1095,9 +1146,8 @@ Normalgame::~Normalgame()
 {
 }
 
-void Normalgame ::run()
+void Normalgame ::run(board &board)
 {
-    board board(true);
     player White = player(true);
     player Black = player(false);
 

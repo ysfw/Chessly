@@ -151,6 +151,6 @@ class Normalgame
 {
 public:
     Normalgame();
-    void run (); 
+    void run (board &board); 
     ~Normalgame();
 };
