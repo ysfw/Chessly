@@ -123,6 +123,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         player->addMove({{this, moveTOstring(position)}, false});
         player->addMove({{this, moveTOstring(position)}, true});
         player->addCapture({targetOnNextSquare, moveTOstring(newPosition)});
+        delete Board.getAt(newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
         this->updatePos(newPosition);
@@ -139,6 +140,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         newHash ^= Board.getPiecehash('p', !movingPieceColor, capturedPawnPos);
         player->addMove({{this, moveTOstring(position)}, true});
+        delete Board.getAt(newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
 
@@ -220,6 +222,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             if(movingPieceColor) Board.setWhitecaptured();
             Board.resetHalfMovesNoCaptures();
             newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
+            delete Board.getAt(newPosition);
         }
         else 
         {
