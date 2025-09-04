@@ -67,9 +67,9 @@ private:
 public:
     board(bool fullBoard);
     // true for normal game -> initialized full board
-    static optional<board> boardFromFEN(string FEN);
+    static board* boardFromFEN(string FEN);
 
-    // ~board();
+    ~board();
 
     bool isWhiteTurn();
     void switchTurns();

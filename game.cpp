@@ -278,15 +278,15 @@ vector<string> splitFEN(string FEN)
     return res;
 }
 
-optional<board> board::boardFromFEN(string FEN)
+board *board::boardFromFEN(string FEN)
 {
     regex e(R"(^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+\s[wb]\s(?:K?Q?k?q?|-)\s(?:[a-h][36]|-)\s\d+\s[1-9]\d*$)");
     if (!regex_match(FEN, e))
     {
-        return nullopt;
+        return nullptr;
     }
 
-    board Board(false);
+    board *Board = new board(false);
     vector<string> splitFENstrs = splitFEN(FEN);
     bool loadedwhiteKing = false, loadedblackKing = false;
     int rank = 7, file = 0;
@@ -295,14 +295,21 @@ optional<board> board::boardFromFEN(string FEN)
         if (a == '/')
         {
             if (file != 8)
-                return nullopt;
+            {
+                delete Board;
+                return nullptr;
+            }
+
             file = 0;
             rank--;
             continue;
         }
 
-        if (file > 7 || Board.whitePawns > 8 || Board.blackPawns > 8)
-            return nullopt;
+        if (file > 7 || Board->whitePawns > 8 || Board->blackPawns > 8)
+        {
+            delete Board;
+            return nullptr;
+        }
 
         if (isdigit(a))
         {
@@ -314,39 +321,57 @@ optional<board> board::boardFromFEN(string FEN)
         else
         {
             if ((a == 'k' && loadedblackKing) || (a == 'K' && loadedwhiteKing))
-                return nullopt;
+            {
+                delete Board;
+                return nullptr;
+            }
+
             else if ((a == 'k' && !loadedblackKing))
                 loadedblackKing = true;
             else if ((a == 'K' && !loadedwhiteKing))
                 loadedwhiteKing = true;
 
             if ((a == 'p' || a == 'P') && (rank == 7 || rank == 0))
-                return nullopt;
-            Board.setAt({rank, file}, Board.createPieceFromChar(a, {rank, file}));
+            {
+                delete Board;
+                return nullptr;
+            }
+
+            Board->setAt({rank, file}, Board->createPieceFromChar(a, {rank, file}));
             file++;
         }
     }
 
     if (rank != 0 || file != 8)
     {
-        return nullopt; // The FEN did not describe a full 8x8 board.
+        delete Board;
+        return nullptr;
+        // The FEN did not describe a full 8x8 board.
     }
 
     if (splitFENstrs[1][0] == 'w')
     {
-        if (!Board.AttackedBy(Board.blackKingPosition, false).empty())
-            return nullopt;
-        Board.whiteTurn = true;
+        if (!Board->AttackedBy(Board->blackKingPosition, false).empty())
+        {
+            delete Board;
+            return nullptr;
+        }
+
+        Board->whiteTurn = true;
     }
     else
     {
-        if (!Board.AttackedBy(Board.whiteKingPosition, true).empty())
-            return nullopt;
-        Board.whiteTurn = false;
+        if (!Board->AttackedBy(Board->whiteKingPosition, true).empty())
+        {
+            delete Board;
+            return nullptr;
+        }
+
+        Board->whiteTurn = false;
     }
 
-    king *wk = dynamic_cast<king *>(Board.getAt(Board.whiteKingPosition));
-    king *bk = dynamic_cast<king *>(Board.getAt(Board.blackKingPosition));
+    king *wk = dynamic_cast<king *>(Board->getAt(Board->whiteKingPosition));
+    king *bk = dynamic_cast<king *>(Board->getAt(Board->blackKingPosition));
 
     for (char flag : splitFENstrs[2])
     {
@@ -354,40 +379,44 @@ optional<board> board::boardFromFEN(string FEN)
         {
         case 'K':
         {
-            piece *r = Board.getAt({0, 7});
-            if (Board.getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
+            piece *r = Board->getAt({0, 7});
+            if (Board->getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
             {
-                return nullopt;
+                delete Board;
+                return nullptr;
             }
             wk->setKingsideCastle();
             break;
         }
         case 'Q':
         {
-            piece *r = Board.getAt({0, 0});
-            if (Board.getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
+            piece *r = Board->getAt({0, 0});
+            if (Board->getKingPosition(true) != pos{0, 4} || r == nullptr || r->getType() != 'r')
             {
-                return nullopt;
+                delete Board;
+                return nullptr;
             }
             wk->setQueensideCastle();
             break;
         }
         case 'k':
         {
-            piece *r = Board.getAt({7, 7});
-            if (Board.getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
+            piece *r = Board->getAt({7, 7});
+            if (Board->getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
             {
-                return nullopt;
+                delete Board;
+                return nullptr;
             }
             bk->setKingsideCastle();
             break;
         }
         case 'q':
         {
-            piece *r = Board.getAt({7, 0});
-            if (Board.getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
+            piece *r = Board->getAt({7, 0});
+            if (Board->getKingPosition(false) != pos{7, 4} || r == nullptr || r->getType() != 'r')
             {
-                return nullopt;
+                delete Board;
+                return nullptr;
             }
             bk->setQueensideCastle();
             break;
@@ -398,62 +427,70 @@ optional<board> board::boardFromFEN(string FEN)
     if (splitFENstrs[3] != "-")
     {
         pos newenpassantpos = stringTOmove(splitFENstrs[3]);
-        if ((newenpassantpos.first == 5 && !Board.whiteTurn) || (newenpassantpos.first == 2 && Board.whiteTurn))
+        if ((newenpassantpos.first == 5 && !Board->whiteTurn) || (newenpassantpos.first == 2 && Board->whiteTurn))
         {
-            return nullopt;
+            delete Board;
+            return nullptr;
         }
-        if (Board.getAt(newenpassantpos) != nullptr ||
-            (Board.whiteTurn && Board.getAt({newenpassantpos.first + 1, newenpassantpos.second}) != nullptr) ||
-            (!Board.whiteTurn && Board.getAt({newenpassantpos.first - 1, newenpassantpos.second}) != nullptr))
+        if (Board->getAt(newenpassantpos) != nullptr ||
+            (Board->whiteTurn && Board->getAt({newenpassantpos.first + 1, newenpassantpos.second}) != nullptr) ||
+            (!Board->whiteTurn && Board->getAt({newenpassantpos.first - 1, newenpassantpos.second}) != nullptr))
         {
-            return nullopt;
+            delete Board;
+            return nullptr;
         }
-        Board.enPassantFile = newenpassantpos.second;
+        Board->enPassantFile = newenpassantpos.second;
 
-        if (Board.whiteTurn)
+        if (Board->whiteTurn)
         {
-            pawn *p = dynamic_cast<pawn *>(Board.getAt({newenpassantpos.first - 1, newenpassantpos.second}));
+            pawn *p = dynamic_cast<pawn *>(Board->getAt({newenpassantpos.first - 1, newenpassantpos.second}));
             if (p != nullptr)
             {
                 p->setenpassant();
-                Board.setEnpassant();
+                Board->setEnpassant();
             }
             else
-                return nullopt;
+            {
+                delete Board;
+                return nullptr;
+            }
         }
 
-        if (!Board.whiteTurn)
+        if (!Board->whiteTurn)
         {
-            pawn *p = dynamic_cast<pawn *>(Board.getAt({newenpassantpos.first + 1, newenpassantpos.second}));
+            pawn *p = dynamic_cast<pawn *>(Board->getAt({newenpassantpos.first + 1, newenpassantpos.second}));
             if (p != nullptr)
             {
                 p->setenpassant();
-                Board.setEnpassant();
+                Board->setEnpassant();
             }
             else
-                return nullopt;
+            {
+                delete Board;
+                return nullptr;
+            }
         }
     }
     else
-        Board.enPassantFile = NO_FILE;
+        Board->enPassantFile = NO_FILE;
 
-    Board.halfmovesNoCaptures = stoi(splitFENstrs[4]);
-    Board.fullmoves = stoi(splitFENstrs[5]);
+    Board->halfmovesNoCaptures = stoi(splitFENstrs[4]);
+    Board->fullmoves = stoi(splitFENstrs[5]);
 
-    uint64_t inititalHash = Board.calculateintitialZobristHash();
-    Board.addHash(inititalHash);
-    Board.setPreviousHash(inititalHash);
+    uint64_t inititalHash = Board->calculateintitialZobristHash();
+    Board->addHash(inititalHash);
+    Board->setPreviousHash(inititalHash);
     return Board;
 }
 
-// board::~board()
-// {
-//     for(int i =0 ; i<8;i++)
-//             {
-//                 for(int j =0 ; j<8;j++)
-//                     delete this->getAt({i,j});
-//             }
-// }
+board::~board()
+{
+    for(int i =0 ; i<8;i++)
+            {
+                for(int j =0 ; j<8;j++)
+                    delete this->getAt({i,j});
+            }
+}
 
 void board::minusPiece(char pieceType, bool isWhite)
 {
