@@ -232,6 +232,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
         player->addMove({{this, moveTOstring(position)}, false});
         Board.setAt(newPosition, promotedPiece);
+        delete Board.getAt(position);
         Board.setAt(position, nullptr);
 
         Board.resetEnpassant();

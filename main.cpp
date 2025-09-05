@@ -30,10 +30,11 @@ int main (){
             string fenString;
             getline(cin, fenString);
 
-            if (auto boardOptional = board::boardFromFEN(fenString)) {
+            if (board* boardOptional = board::boardFromFEN(fenString)) {
 
-                board Board = *boardOptional; 
-                game.run(Board);       
+                board* Board = boardOptional; 
+                game.run(*Board);       
+                delete Board;
                 break;
             } else {
                 cout << "Error: Invalid or malformed FEN string." << endl;
