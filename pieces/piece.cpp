@@ -93,15 +93,77 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     };
     map<char, int> pieceType = {
         {'p', PAWN}, {'n', KNIGHT}, {'b', BISHOP}, {'r', ROOK}, {'q', QUEEN}, {'k', KING}};
-    newHash ^= Board.getWhiteTurnkey();
-    if (Board.getEnPassantFile() != NO_FILE)
-    {
-        newHash ^= Board.getenPassantFileKey(Board.getEnPassantFile());
-    }
-    newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, this->position);
-
+        newHash ^= Board.getWhiteTurnkey();
+        if (Board.getEnPassantFile() != NO_FILE)
+        {
+            newHash ^= Board.getenPassantFileKey(Board.getEnPassantFile());
+        }
+        newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, this->position);
+        
+        // --- BRANCH 4: Promotion ---
+        if (isPromotion)
+        {
+    
+            piece *promotedPiece = nullptr;
+            char promotionPieceType = getPromotionPiece();
+            Board.plusPiece(promotionPieceType,this->White);
+            Board.minusPiece('p',this->White);
+            if (targetOnNextSquare != nullptr)
+            {
+                char capturedPieceType = targetOnNextSquare->getType();
+                int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
+                Board.minusPiece(capturedPieceType,capturedPieceColor);
+                if(movingPieceColor) Board.setWhitecaptured();
+                Board.resetHalfMovesNoCaptures();
+                newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
+                delete targetOnNextSquare;
+            }
+            else 
+            {
+                if(movingPieceColor) Board.resetWhitecaptured();
+                Board.plusHalfMoveNoCaptures();
+            }
+            switch (promotionPieceType)
+            {
+                case 'q':
+                {
+                    promotedPiece = new queen(this->White, newPosition);
+                    Board.setAt(newPosition,promotedPiece);
+                    break;
+                }
+    
+                case 'r':
+                {
+                    promotedPiece = new rook(this->White, newPosition);
+                    Board.setAt(newPosition,promotedPiece);
+                    break;
+                }
+                case 'b':
+                {
+                    promotedPiece = new bishop(this->White, newPosition);
+                    Board.setAt(newPosition,promotedPiece);
+                    break;
+                }
+                case 'n':
+                {
+                    promotedPiece = new Knight(this->White, newPosition);
+                    Board.setAt(newPosition,promotedPiece);
+                    break;
+                }
+                default:
+                break;
+            }
+            newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
+            player->addMove({{this, moveTOstring(position)}, false});
+            Board.setAt(newPosition, promotedPiece);
+            delete Board.getAt(position);
+            Board.setAt(position, nullptr);
+    
+            Board.resetEnpassant();
+            Board.resetEnPassantFile();
+        }
     // --- BRANCH 1: Capture ---
-    if (isCapture && !isEnPassantCapture)
+    else if (isCapture && !isEnPassantCapture)
     {
         Board.resetHalfMovesNoCaptures();
         if(movingPieceColor) Board.setWhitecaptured();
@@ -157,7 +219,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     else if (isCastle)
     {
         if(movingPieceColor) Board.resetWhitecaptured();
-        else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
+        Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         bool kingSide = (newPosition.second > position.second);
         player->addMove({{this, kingSide ? "0-0" : "0-0-0"}, false});
@@ -176,74 +238,12 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         this->updatePos(newPosition);
         rook->updatePos(newRookPos);
     }
-    // --- BRANCH 4: Promotion ---
-    else if (isPromotion)
-    {
-
-        piece *promotedPiece = nullptr;
-        char promotionPieceType = getPromotionPiece();
-        Board.plusPiece(promotionPieceType,this->White);
-        Board.minusPiece('p',this->White);
-        switch (promotionPieceType)
-        {
-            case 'q':
-            {
-                promotedPiece = new queen(this->White, newPosition);
-                Board.setAt(newPosition,promotedPiece);
-                break;
-            }
-
-            case 'r':
-            {
-                promotedPiece = new rook(this->White, newPosition);
-                Board.setAt(newPosition,promotedPiece);
-                break;
-            }
-            case 'b':
-            {
-                promotedPiece = new bishop(this->White, newPosition);
-                Board.setAt(newPosition,promotedPiece);
-                break;
-            }
-            case 'n':
-            {
-                promotedPiece = new Knight(this->White, newPosition);
-                Board.setAt(newPosition,promotedPiece);
-                break;
-            }
-            default:
-            break;
-        }
-        if (targetOnNextSquare != nullptr)
-        {
-            char capturedPieceType = targetOnNextSquare->getType();
-            int capturedPieceColor = targetOnNextSquare->isWhite() ? 1 : 0;
-            Board.minusPiece(capturedPieceType,capturedPieceColor);
-            if(movingPieceColor) Board.setWhitecaptured();
-            Board.resetHalfMovesNoCaptures();
-            newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
-            delete Board.getAt(newPosition);
-        }
-        else 
-        {
-            if(movingPieceColor) Board.resetWhitecaptured();
-            else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
-        }
-        newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
-        player->addMove({{this, moveTOstring(position)}, false});
-        Board.setAt(newPosition, promotedPiece);
-        delete Board.getAt(position);
-        Board.setAt(position, nullptr);
-
-        Board.resetEnpassant();
-        Board.resetEnPassantFile();
-    }
 
     // --- BRANCH 5: Non-Capture Move ---
     else
     {
         if(movingPieceColor) Board.resetWhitecaptured();
-        else if(!Board.DidWhitecapture() && !movingPieceColor) Board.plusHalfMoveNoCaptures();
+        Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);

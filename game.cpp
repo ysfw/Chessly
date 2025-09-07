@@ -474,7 +474,7 @@ board *board::boardFromFEN(string FEN)
     else
         Board->enPassantFile = NO_FILE;
 
-    Board->halfmovesNoCaptures = stoi(splitFENstrs[4]);
+    Board->halfmovesNoCaptures = (stoi(splitFENstrs[4]));
     Board->fullmoves = stoi(splitFENstrs[5]);
 
     uint64_t inititalHash = Board->calculateintitialZobristHash();
@@ -1118,11 +1118,11 @@ bool board::isInsufficientMaterial()
 
 bool board::is50MoveDraw()
 {
-    return (halfmovesNoCaptures >= 50);
+    return (halfmovesNoCaptures >= 100);
 }
 bool board::is75MoveDraw()
 {
-    return (halfmovesNoCaptures == 75);
+    return (halfmovesNoCaptures == 150);
 }
 
 void board ::printBoardB()
@@ -1165,6 +1165,11 @@ void board ::printBoardW()
     cout << '\n';
 }
 
+int board::getHalfmovesNoCaptures()
+{
+    return halfmovesNoCaptures;
+}
+
 void player ::addMove(pair<pair<piece *, string>, bool> move)
 {
     moves.push(move);
@@ -1205,29 +1210,34 @@ void Normalgame ::run(board &board)
         // //debug zobrist History
         //     std::ofstream outputFile("output.txt", std::ios::app);
         //     if (!outputFile.is_open()) {
-        //         std::cerr << "Error opening file!" << std::endl;
-        //         return;
-        //     }
-        //     std::streambuf* originalCoutBuffer = std::cout.rdbuf();
-        //     std::cout.rdbuf(outputFile.rdbuf());
-        //     cout << "Last Hash = " << board.getPreviousHash() << "  Repeated = "<< board.repeted(board.getPreviousHash())<< endl;
-        //     std::cout.rdbuf(originalCoutBuffer);
-        //     outputFile.close();
-        // //endofdebug
-
+            //         std::cerr << "Error opening file!" << std::endl;
+            //         return;
+            //     }
+            //     std::streambuf* originalCoutBuffer = std::cout.rdbuf();
+            //     std::cout.rdbuf(outputFile.rdbuf());
+            //     cout << "Last Hash = " << board.getPreviousHash() << "  Repeated = "<< board.repeted(board.getPreviousHash())<< endl;
+            //     std::cout.rdbuf(originalCoutBuffer);
+            //     outputFile.close();
+            // //endofdebug
+            
         if (board.isCheckmate(whiteTurn))
         {
-            cout << "Black Wins By Checkmate." << endl;
+            cout << "White Wins By Checkmate." << endl;
             return;
         }
         else if (board.isCheckmate(!whiteTurn))
         {
-            cout << "White Wins By Checkmate." << endl;
+            cout << "Black Wins By Checkmate." << endl;
             return;
         }
         else if (board.isStalemate(whiteTurn))
         {
             cout << "Draw By Stalemate." << endl;
+            return;
+        }
+        else if (board.isInsufficientMaterial())
+        {
+            cout << "Draw By Insufficient Material." << endl;
             return;
         }
         else if (board.is75MoveDraw())

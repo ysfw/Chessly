@@ -84,6 +84,8 @@ public:
     void plusFullMove();
     void minusHalfMoveNoCaptures();
     void plusHalfMoveNoCaptures();
+    int getHalfmovesNoCaptures(); // for debugging purposes 
+
     void resetHalfMovesNoCaptures();
     
     void setAt(pos position,piece* Pointer2piece);
