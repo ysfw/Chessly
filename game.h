@@ -1,6 +1,8 @@
 #pragma once
 #include <bits/stdc++.h>
 #include "pieces/piece.h"
+#include <ncursesw/ncurses.h>
+#include <limits>
 using namespace std;
 
 
