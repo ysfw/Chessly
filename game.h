@@ -14,14 +14,6 @@ void clearScreen();
 vector<string> splitFEN (string FEN);
 string buildFEN (board &board);
 
-
-struct AttackInfo {
-    //<<<<<<< This turned out to be totally useless I'll need to remove it later....
-    piece* attacker; // A pointer to the piece delivering the attack
-    set<pos> path; // The squares between the attacker and a given square.
-    // This will be EMPTY for direct attackers like knights and pawns.
-};
-
 const int NO_FILE = -1; 
 
 class board
@@ -93,7 +85,7 @@ public:
     
     void setAt(pos position,piece* Pointer2piece);
     piece* getAt(pos position);
-    vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
+    vector<piece*> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
     bool isPinned(piece* piece, pos newPosition);
     void setKingPosition(bool isWhite, pos newPosition);
     pos getKingPosition(bool isWhite);
@@ -132,29 +124,6 @@ public:
     void printBoardB();
 };
 
-class player
-{
-private:
-    bool White;
-    stack<pair<pair<piece*,string>,bool>> moves;
-    /*the string is a representative of the old position
-    since new position is updated within the piece after each move
-    and the boolean is used to check whether the move was a capture or not*/
-    stack<pair<piece*,string>> captured;
-    pair<piece*,string> undoneMove;
-    pair<piece*,string> undoneCapture;
-    pair<int,int> time; //minute:second
-    int rating;
-public:
-    player(bool isWhite);
-    bool isWhite() {return White;};
-    void addMove (pair<pair<piece*,string>,bool> move);
-    void addCapture (pair<piece*,string> capture);
-    void undo();
-    void redo();
-    ~player();
-};
-
 
 class game
 {
@@ -163,4 +132,5 @@ public:
     void run (board &board); 
     ~game();
     void saveGame(board &board);
+    void loadGame();
 };

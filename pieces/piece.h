@@ -31,7 +31,7 @@ public:
     void addPossibleCapture(pos move);
     set<pos> getPossibleMoves ();
     set<pos> getPossibleCaptures ();
-    bool Move(player *player,board &Board,pos newPosition);
+    bool Move(board &Board,pos newPosition);
     virtual void checkMoves(board &Board, pos currPosition);
     void clearMoves();
 

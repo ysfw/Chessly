@@ -666,9 +666,9 @@ pos board ::getKingPosition(bool isWhite)
     return isWhite ? whiteKingPosition : blackKingPosition;
 }
 
-vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
+vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
 {
-    vector<AttackInfo> result;
+    vector<piece *> result;
     for (size_t i = 0; i < 8; i++)
     {
         for (size_t j = 0; j < 8; j++)
@@ -679,15 +679,13 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
             }
             else
             {
-                set<pos> possiblePath;
-                AttackInfo currAttk;
+                piece *currAttk;
                 if (pawn *p = dynamic_cast<pawn *>(this->getAt({i, j})))
                 {
                     int forwardOne = p->isWhite() ? p->getPosition().first + 1 : p->getPosition().first - 1;
                     if (forwardOne == Position.first && (Position.second == p->getPosition().second + 1 || Position.second == p->getPosition().second - 1))
                     {
-                        currAttk.attacker = p;
-                        currAttk.path = possiblePath;
+                        currAttk = p;
                         result.push_back(currAttk);
                     }
                 }
@@ -700,8 +698,7 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                         int secondCoord = (int)N->getPosition().second + direction.second;
                         if ((firstCoord < 8 && firstCoord >= 0 && secondCoord < 8 && secondCoord >= 0) && (firstCoord == Position.first && secondCoord == Position.second))
                         {
-                            currAttk.attacker = N;
-                            currAttk.path = possiblePath;
+                            currAttk = N;
                             result.push_back(currAttk);
                         }
                     }
@@ -710,7 +707,6 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (int direction = 1; direction < 5; direction++)
                     {
-                        possiblePath.clear();
 
                         for (size_t k = 1; k < 8; k++)
                         {
@@ -741,22 +737,9 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
 
-                                    currAttk.attacker = R;
-                                    currAttk.path = possiblePath;
+                                    currAttk = R;
                                     result.push_back(currAttk);
                                     break;
-                                }
-                                else
-                                {
-                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
-                                    {
-                                        possiblePath.insert({firstCoord, secondCoord});
-                                    }
-                                    else
-                                    {
-                                        possiblePath.clear();
-                                        break;
-                                    }
                                 }
                             }
                             else
@@ -771,7 +754,6 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (size_t direction = 1; direction < 5; direction++)
                     {
-                        possiblePath.clear();
                         {
                             for (size_t k = 1; k < 8; k++)
                             {
@@ -806,22 +788,9 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                     if (firstCoord == Position.first && secondCoord == Position.second)
                                     {
 
-                                        currAttk.attacker = B;
-                                        currAttk.path = possiblePath;
+                                        currAttk = B;
                                         result.push_back(currAttk);
                                         break;
-                                    }
-                                    else
-                                    {
-                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
-                                        {
-                                            possiblePath.insert({firstCoord, secondCoord});
-                                        }
-                                        else
-                                        {
-                                            possiblePath.clear();
-                                            break;
-                                        }
                                     }
                                 }
                                 else
@@ -835,7 +804,6 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (int direction = 1; direction < 5; direction++)
                     {
-                        possiblePath.clear();
                         for (size_t k = 1; k < 8; k++)
                         {
                             size_t firstCoord, secondCoord;
@@ -870,22 +838,9 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
 
-                                    currAttk.attacker = Q;
-                                    currAttk.path = possiblePath;
+                                    currAttk = Q;
                                     result.push_back(currAttk);
                                     break;
-                                }
-                                else
-                                {
-                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
-                                    {
-                                        possiblePath.insert({firstCoord, secondCoord});
-                                    }
-                                    else
-                                    {
-                                        possiblePath.clear();
-                                        break;
-                                    }
                                 }
                             }
                             else
@@ -894,7 +849,6 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                     }
                     for (size_t direction = 1; direction < 5; direction++)
                     {
-                        possiblePath.clear();
                         {
                             for (size_t k = 1; k < 8; k++)
                             {
@@ -929,22 +883,9 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                     if (firstCoord == Position.first && secondCoord == Position.second)
                                     {
 
-                                        currAttk.attacker = Q;
-                                        currAttk.path = possiblePath;
+                                        currAttk = Q;
                                         result.push_back(currAttk);
                                         break;
-                                    }
-                                    else
-                                    {
-                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
-                                        {
-                                            possiblePath.insert({firstCoord, secondCoord});
-                                        }
-                                        else
-                                        {
-                                            possiblePath.clear();
-                                            break;
-                                        }
                                     }
                                 }
                                 else
@@ -962,8 +903,7 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
                         int secondCoord = (int)K->getPosition().second + direction.second;
                         if ((firstCoord < 8 && firstCoord >= 0 && secondCoord < 8 && secondCoord >= 0) && (firstCoord == Position.first && secondCoord == Position.second))
                         {
-                            currAttk.attacker = K;
-                            currAttk.path = possiblePath;
+                            currAttk = K;
                             result.push_back(currAttk);
                         }
                     }
@@ -1194,24 +1134,6 @@ int board::getFullmoves()
     return this->fullmoves;
 }
 
-void player ::addMove(pair<pair<piece *, string>, bool> move)
-{
-    moves.push(move);
-}
-
-void player::addCapture(pair<piece *, string> capture)
-{
-    captured.push(capture);
-}
-player::player(bool isWhite)
-{
-    this->White = isWhite;
-}
-
-player::~player()
-{
-}
-
 game::game(/* args */)
 {
 }
@@ -1222,9 +1144,6 @@ game::~game()
 
 void game ::run(board &board)
 {
-    player White = player(true);
-    player Black = player(false);
-
     regex e("^[a-hA-H][1-8]$");
     while (true)
     {
@@ -1336,7 +1255,7 @@ void game ::run(board &board)
                 continue;
             else
             {
-                if (regex_match(input, e) && selected->Move(whiteTurn ? &White : &Black, board, stringTOmove(input)))
+                if (regex_match(input, e) && selected->Move(board, stringTOmove(input)))
                 {
                     if (board.isTrifoldDraw())
                     {
@@ -1435,11 +1354,13 @@ string buildFEN(board &board)
     }
     else
     {
-        if (board.getEnpassantstr() != ""){
-            
+        if (board.getEnpassantstr() != "")
+        {
+
             FEN += board.getEnpassantstr();
         }
-        else{
+        else
+        {
             FEN += "-";
         }
         FEN += ' ';
@@ -1454,31 +1375,17 @@ string buildFEN(board &board)
 
 void game::saveGame(board &board)
 {
-    filesystem::path Path = "SavedGames";
-
-    if (!filesystem::exists(Path))
-    {
-        if (filesystem::create_directory(Path))
-        {
-        }
-        else
-        {
-            cerr << "Failed to create Save folder." << endl;
-        }
-    }
-    string FEN = buildFEN(board);
-    cout << "Enter the name of the save file: ";
-    string filename;
-    cin >> filename;
-    if (filename.find_first_of("\\/:?\"<>|") != string::npos)
-    {
-        cerr << "Invalid filename. Please avoid using special characters like \\ / : ? \" < > |" << endl;
-        return;
-    }
-    ofstream outFile(Path / (filename + ".txt"));
+    // saving into a csv file with three columns (Date&Time,SaveName,FEN)
+    cout << "Enter a name for the saved game: ";
+    string saveName;
+    cin >> saveName;
+    ofstream outFile("SavedGames.csv", ios::app);
     if (outFile)
     {
-        outFile << FEN;
+        time_t now = time(0);
+        char *dt = ctime(&now);
+        dt[strlen(dt) - 1] = '\0';
+        outFile << dt << "," << saveName << "," << buildFEN(board) << endl;
         outFile.close();
         cout << "Game saved successfully." << endl;
     }
@@ -1486,10 +1393,78 @@ void game::saveGame(board &board)
     {
         cerr << "Failed to save game." << endl;
     }
-
-    this_thread::sleep_for(chrono::seconds(2));
 }
 
+void game::loadGame()
+{
+    // lists all games available with options to choose between them
+    ifstream inFile("SavedGames.csv");
+    if (!inFile)
+    {
+        cerr << "No saved games found." << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        return;
+    }
 
-//// Incrementing halfmoves at the wrong time
-//// fullmoves not incrementing at the right time
+    vector<string> lines;
+    string line;
+    while (getline(inFile, line))
+    {
+        lines.push_back(line);
+    }
+    inFile.close();
+
+    if (lines.empty())
+    {
+        cerr << "No saved games found." << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        return;
+    }
+
+    cout << "Available saved games:" << endl;
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        stringstream ss(lines[i]);
+        string dateTime, saveName, FEN;
+        getline(ss, dateTime, ',');
+        getline(ss, saveName, ',');
+        getline(ss, FEN, ',');
+
+        cout << i + 1 << ". " << saveName << " (Saved on: " << dateTime << ")" << endl;
+    }
+
+    cout << "Enter the number of the game you want to load (or 0 to cancel): ";
+    size_t choice;
+    cin >> choice;
+
+    if (choice == 0)
+    {
+        cout << "Load cancelled." << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        return;
+    }
+
+    if (choice < 1 || choice > lines.size())
+    {
+        cerr << "Invalid choice." << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        return;
+    }
+
+    stringstream ss(lines[choice - 1]);
+    string dateTime, saveName, FEN;
+    getline(ss, dateTime, ',');
+    getline(ss, saveName, ',');
+    getline(ss, FEN, ',');
+
+    if (board::boardFromFEN(FEN) == nullptr)
+    {
+        cerr << "Failed to load the selected game." << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        return;
+    }
+    else
+    {
+        this->run(*board::boardFromFEN(FEN));
+    }
+}

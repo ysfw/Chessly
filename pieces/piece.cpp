@@ -65,7 +65,7 @@ void piece::clearMoves()
 
 void piece ::checkMoves(board &Board, pos currPosition) {}
 
-bool piece::Move(player *player, board &Board, pos newPosition)
+bool piece::Move(board &Board, pos newPosition)
 {
     if (!binary_search(this->possibleMoves.begin(), this->possibleMoves.end(), newPosition))
     {
@@ -154,7 +154,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
                 break;
             }
             newHash ^= Board.getPiecehash(promotionPieceType, movingPieceColor, newPosition);
-            player->addMove({{this, moveTOstring(position)}, false});
             Board.setAt(newPosition, promotedPiece);
             delete Board.getAt(position);
             Board.setAt(position, nullptr);
@@ -183,9 +182,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
             }
         }
         newHash ^= Board.getPiecehash(capturedPieceType, capturedPieceColor, newPosition);
-        player->addMove({{this, moveTOstring(position)}, false});
-        player->addMove({{this, moveTOstring(position)}, true});
-        player->addCapture({targetOnNextSquare, moveTOstring(newPosition)});
         delete Board.getAt(newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
@@ -203,12 +199,9 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         pos capturedPawnPos = {this->position.first, newPosition.second};
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         newHash ^= Board.getPiecehash('p', !movingPieceColor, capturedPawnPos);
-        player->addMove({{this, moveTOstring(position)}, true});
         delete Board.getAt(newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
-
-        player->addCapture({Board.getAt(capturedPawnPos), moveTOstring(capturedPawnPos)});
         Board.setAt(capturedPawnPos, nullptr);
 
         this->updatePos(newPosition);
@@ -225,7 +218,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         bool kingSide = (newPosition.second > position.second);
-        player->addMove({{this, kingSide ? "0-0" : "0-0-0"}, false});
         Board.setAt(newPosition, this);
         pos oldRookPos = {position.first, kingSide ? 7 : 0};
         pos newRookPos = {position.first, kingSide ? newPosition.second - 1 : newPosition.second + 1};

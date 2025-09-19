@@ -4,88 +4,53 @@
 
 #include "game.h"
 int main() {
-    setlocale(LC_ALL, "");
-    initscr();
-    noecho();
-    cbreak();
-    keypad(stdscr, TRUE);
-
-    string menuItems[] = {"New Game", "Load from FEN", "Exit"};
-    int choice;
-    int highlight = 0;
-
     game game;
 
     while (true) {
-        clear();
-        mvprintw(0, 0, "--- Chessly ---");
-        for (int i = 0; i < 3; i++) {
-            if (i == highlight) {
-                attron(A_REVERSE);
+          clearScreen();
+        cout << "--- Chessly ---" << endl;
+        cout << "1. New Game" << endl;
+        cout << "2. Load from FEN" << endl;
+        cout << "3. Load Saved Game" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Choose an option: ";
+
+        string choice;
+        cin >> choice;
+
+        if (choice == "1") {
+            board newBoard(true); 
+
+            game.run(newBoard);   
+            break; 
+
+        } else if (choice == "2") {
+            cout << "Please enter the FEN string: " << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            string fenString;
+            getline(cin, fenString);
+                if (board* boardOptional = board::boardFromFEN(fenString)) {
+                             board* Board = boardOptional; 
+                game.run(*Board);       
+                delete Board;
+                 } else {
+                cout << "Error: Invalid or malformed FEN string." << endl;
+                cout << "Press Enter to return to the menu." << endl;
+                cin.get();
             }
-            mvprintw(i + 2, 2, menuItems[i].c_str());
-            attroff(A_REVERSE);
+
+        } else if (choice == "3") {
+            cout << "Loading saved games..." << endl;
+            game.loadGame();
+        } 
+
+        else if (choice == "4") {
+            cout << "Exiting." << endl;
+            break;
+             } else {
+            cout << "Invalid choice. Press Enter to try again." << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
+            }
         }
-
-        choice = getch();
-
-        switch (choice) {
-            case KEY_UP:
-                highlight = (highlight - 1 + 3) % 3;
-                break;
-            case KEY_DOWN:
-                highlight = (highlight + 1) % 3;
-                break;
-            case 10:
-                if (highlight == 0) {
-                    {
-                        board newBoard(true);
-                        endwin();
-                        game.run(newBoard);
-                        return 0;
-                    }
-                } else if (highlight == 1) {
-                    {
-                        endwin();
-                        cout << "Please enter the FEN string: " << endl;
-                        string fenString;
-                        getline(cin, fenString);
-
-                        if (board* boardOptional = board::boardFromFEN(fenString)) {
-                            board* Board = boardOptional;
-                            game.run(*Board);
-                            delete Board;
-                            return 0;
-                        } else {
-                            cout << "Invalid or malformed FEN string." << endl;
-                            cout << "Press Enter to return to the menu." << endl;
-                            cin.get();
-                            initscr();
-                            noecho();
-                            cbreak();
-                            keypad(stdscr, TRUE);
-                        }
-                    }
-                } else if (highlight == 2) { // Exit
-                    endwin();
-                    cout << "Exiting." << endl;
-                    return 0;
-                }
-                break;
-        }
-    }
-
-    endwin();
 }
-
-//Remaining Stuff to be done before moving to GUI 
-
-
-/*
-- fixing notation to the PGN
-- saving positions
-- redo/undo moves
-- Refactor and optimize if possible
-- adding the stockfish functionality to play 1 Vs bot and evaluate game
-(possibly and might be left to do in the GUI version)
-*/
