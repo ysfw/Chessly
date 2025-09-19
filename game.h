@@ -12,7 +12,7 @@ pos stringTOmove(string move);
 char getPromotionPiece();
 void clearScreen();
 vector<string> splitFEN (string FEN);
-
+string buildFEN (board &board);
 
 
 struct AttackInfo {
@@ -63,6 +63,7 @@ private:
     bool enpassant = false;
     bool didWhiteCapture =false; 
     int enPassantFile;
+    string enpassantPositionstr;
     piece* createPieceFromChar(char pieceChar, pos position);
     int whiteQueens, whiteRooks, whiteBishops, whiteKnights , whitePawns ;
     int blackQueens, blackRooks, blackBishops, blackKnights , blackPawns ;
@@ -87,7 +88,7 @@ public:
     void minusHalfMoveNoCaptures();
     void plusHalfMoveNoCaptures();
     int getHalfmovesNoCaptures(); // for debugging purposes 
-
+    int getFullmoves();
     void resetHalfMovesNoCaptures();
     
     void setAt(pos position,piece* Pointer2piece);
@@ -115,7 +116,9 @@ public:
     int getEnPassantFile();
     void setEnPassantFile(int file);
     void resetEnPassantFile();
-    
+    void setEnpassantstr(string pos);
+    string getEnpassantstr();
+
     bool isCheckmate (bool isWhiteTurn);
     bool isStalemate (bool isWhiteTurn);
     bool isTrifoldDraw ();
@@ -153,10 +156,11 @@ public:
 };
 
 
-class Normalgame
+class game
 {
 public:
-    Normalgame();
+    game();
     void run (board &board); 
-    ~Normalgame();
+    ~game();
+    void saveGame(board &board);
 };

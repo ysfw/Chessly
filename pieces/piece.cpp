@@ -100,7 +100,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         }
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, this->position);
         
-        // --- BRANCH 4: Promotion ---
+        // --- BRANCH 1: Promotion ---
         if (isPromotion)
         {
     
@@ -161,8 +161,9 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     
             Board.resetEnpassant();
             Board.resetEnPassantFile();
+            Board.setEnpassantstr("");
         }
-    // --- BRANCH 1: Capture ---
+    // --- BRANCH 2: Capture ---
     else if (isCapture && !isEnPassantCapture)
     {
         Board.resetHalfMovesNoCaptures();
@@ -191,8 +192,9 @@ bool piece::Move(player *player, board &Board, pos newPosition)
         this->updatePos(newPosition);
         Board.resetEnpassant(); // A capture resets any en passant opportunity
         Board.resetEnPassantFile();
+        Board.setEnpassantstr("");
     }
-    // --- BRANCH 2: En Passant Capture ---
+    // --- BRANCH 3: En Passant Capture ---
     else if (isEnPassantCapture)
     {
         Board.resetHalfMovesNoCaptures();
@@ -213,9 +215,10 @@ bool piece::Move(player *player, board &Board, pos newPosition)
 
         Board.resetEnpassant(); // An en passant capture also resets the state
         Board.resetEnPassantFile();
+        Board.setEnpassantstr("");
     }
 
-    // --- BRANCH 3: Castling Move ---
+    // --- BRANCH 4: Castling Move ---
     else if (isCastle)
     {
         if(movingPieceColor) Board.resetWhitecaptured();
@@ -235,6 +238,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
 
         Board.resetEnpassant();
         Board.resetEnPassantFile();
+        Board.setEnpassantstr("");
         this->updatePos(newPosition);
         rook->updatePos(newRookPos);
     }
@@ -243,7 +247,6 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     else
     {
         if(movingPieceColor) Board.resetWhitecaptured();
-        Board.plusHalfMoveNoCaptures();
         newHash ^= Board.getPiecehash(movingPieceType, movingPieceColor, newPosition);
         Board.setAt(newPosition, this);
         Board.setAt(position, nullptr);
@@ -254,19 +257,38 @@ bool piece::Move(player *player, board &Board, pos newPosition)
                 Board.setEnpassant();
                 Board.setEnPassantFile(newPosition.second);
                 p->setenpassant();
+                pawn* possibility1 = nullptr;
+                pawn* possibility2 = nullptr;
+                
+                if (newPosition.second > 0)
+                {
+                    possibility1 = dynamic_cast<pawn *>(Board.getAt({newPosition.first, newPosition.second - 1}));
+                }
+                if (newPosition.second < 7)
+                {
+                    possibility2 = dynamic_cast<pawn *>(Board.getAt({newPosition.first, newPosition.second + 1}));
+                }
+                if ((possibility1 != nullptr && possibility1->isWhite() != this->isWhite()) || (possibility2 != nullptr && possibility2->isWhite() != this->isWhite()))
+                {
+                    Board.setEnpassantstr(moveTOstring({newPosition.first-1,newPosition.second}));
+                }
+
                 newHash ^= Board.getenPassantFileKey(newPosition.second);
             }
             else
             {
-
+                
                 Board.resetEnpassant();
                 Board.resetEnPassantFile();
+                Board.setEnpassantstr("");
             }
         }
         else
         {
             Board.resetEnpassant();
             Board.resetEnPassantFile();
+            Board.setEnpassantstr("");
+            Board.plusHalfMoveNoCaptures();
         }
 
         this->updatePos(newPosition);
@@ -306,8 +328,7 @@ bool piece::Move(player *player, board &Board, pos newPosition)
     }
     Board.addHash(newHash);
     Board.setPreviousHash(newHash);
-    return true;
-
+    
     if(!Board.isWhiteTurn())
         Board.plusFullMove();
 

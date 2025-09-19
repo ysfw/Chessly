@@ -255,6 +255,13 @@ board::board(bool fullBoard)
                 }
             }
         }
+        fullmoves = 1;
+        king *wk = dynamic_cast<king *>(getAt(getKingPosition(true)));
+        king *bk = dynamic_cast<king *>(getAt(getKingPosition(false)));
+        wk->setKingsideCastle();
+        wk->setQueensideCastle();
+        bk->setKingsideCastle();
+        bk->setQueensideCastle();
     }
     uint64_t inititalHash = calculateintitialZobristHash();
     this->addHash(inititalHash);
@@ -427,6 +434,8 @@ board *board::boardFromFEN(string FEN)
     if (splitFENstrs[3] != "-")
     {
         pos newenpassantpos = stringTOmove(splitFENstrs[3]);
+        Board->setEnpassantstr(splitFENstrs[3]);
+
         if ((newenpassantpos.first == 5 && !Board->whiteTurn) || (newenpassantpos.first == 2 && Board->whiteTurn))
         {
             delete Board;
@@ -485,11 +494,11 @@ board *board::boardFromFEN(string FEN)
 
 board::~board()
 {
-    for(int i =0 ; i<8;i++)
-            {
-                for(int j =0 ; j<8;j++)
-                    delete this->getAt({i,j});
-            }
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+            delete this->getAt({i, j});
+    }
 }
 
 void board::minusPiece(char pieceType, bool isWhite)
@@ -625,6 +634,16 @@ int board::getEnPassantFile()
 void board::setEnPassantFile(int file)
 {
     enPassantFile = file;
+}
+
+void board::setEnpassantstr(string pos)
+{
+    this->enpassantPositionstr = pos;
+}
+
+string board::getEnpassantstr()
+{
+    return this->enpassantPositionstr;
 }
 
 void board::resetEnPassantFile()
@@ -1170,6 +1189,11 @@ int board::getHalfmovesNoCaptures()
     return halfmovesNoCaptures;
 }
 
+int board::getFullmoves()
+{
+    return this->fullmoves;
+}
+
 void player ::addMove(pair<pair<piece *, string>, bool> move)
 {
     moves.push(move);
@@ -1188,15 +1212,15 @@ player::~player()
 {
 }
 
-Normalgame::Normalgame(/* args */)
+game::game(/* args */)
 {
 }
 
-Normalgame::~Normalgame()
+game::~game()
 {
 }
 
-void Normalgame ::run(board &board)
+void game ::run(board &board)
 {
     player White = player(true);
     player Black = player(false);
@@ -1208,18 +1232,18 @@ void Normalgame ::run(board &board)
         clearScreen();
 
         // //debug zobrist History
-        //     std::ofstream outputFile("output.txt", std::ios::app);
+        //     ofstream outputFile("output.txt", ios::app);
         //     if (!outputFile.is_open()) {
-            //         std::cerr << "Error opening file!" << std::endl;
-            //         return;
-            //     }
-            //     std::streambuf* originalCoutBuffer = std::cout.rdbuf();
-            //     std::cout.rdbuf(outputFile.rdbuf());
-            //     cout << "Last Hash = " << board.getPreviousHash() << "  Repeated = "<< board.repeted(board.getPreviousHash())<< endl;
-            //     std::cout.rdbuf(originalCoutBuffer);
-            //     outputFile.close();
-            // //endofdebug
-            
+        //         cerr << "Error opening file!" << endl;
+        //         return;
+        //     }
+        //     streambuf* originalCoutBuffer = cout.rdbuf();
+        //     cout.rdbuf(outputFile.rdbuf());
+        //     cout << "Last Hash = " << board.getPreviousHash() << "  Repeated = "<< board.repeted(board.getPreviousHash())<< endl;
+        //     cout.rdbuf(originalCoutBuffer);
+        //     outputFile.close();
+        // //endofdebug
+
         if (board.isCheckmate(whiteTurn))
         {
             cout << "White Wins By Checkmate." << endl;
@@ -1258,13 +1282,18 @@ void Normalgame ::run(board &board)
         }
         whiteTurn ? board.printBoardW() : board.printBoardB();
         string input;
-        cout << "Select a piece (e.g., e2 e4) or type exit: ";
+        cout << "Select a piece (e.g., e2 e4) , type exit to quit or save to save the game: ";
         cin >> input;
         transform(input.begin(), input.end(), input.begin(), ::tolower);
         if (input == "exit")
         {
             cout << "Exiting the game." << endl;
             return;
+        }
+        else if (input == "save")
+        {
+            saveGame(board);
+            continue;
         }
 
         else if (regex_match(input, e))
@@ -1274,7 +1303,7 @@ void Normalgame ::run(board &board)
             if (selected == nullptr || whiteTurn != selected->isWhite())
             {
                 cout << "Illegal move" << endl;
-                this_thread::sleep_for(std::chrono::seconds(2));
+                this_thread::sleep_for(chrono::seconds(2));
                 continue;
             }
 
@@ -1286,7 +1315,7 @@ void Normalgame ::run(board &board)
             if (moves.empty())
             {
                 cout << "No possible moves" << endl;
-                this_thread::sleep_for(std::chrono::seconds(2));
+                this_thread::sleep_for(chrono::seconds(2));
                 continue;
             }
             cout << "Possible moves (Red is capturable): ";
@@ -1320,7 +1349,7 @@ void Normalgame ::run(board &board)
                 else
                 {
                     cout << "Illegal move" << endl;
-                    this_thread::sleep_for(std::chrono::seconds(2));
+                    this_thread::sleep_for(chrono::seconds(2));
                     continue;
                 }
             }
@@ -1333,3 +1362,134 @@ void Normalgame ::run(board &board)
         }
     }
 }
+
+string buildFEN(board &board)
+{
+    string FEN = "";
+
+    for (int i = 7; i >= 0; i--)
+    {
+        int emptyCounter = 0;
+        for (int j = 0; j < 8; j++)
+        {
+            piece *curr = board.getAt({i, j});
+            if (curr == nullptr)
+                emptyCounter++;
+            else
+            {
+                if (emptyCounter > 0)
+                {
+                    FEN += to_string(emptyCounter);
+                    emptyCounter = 0;
+                }
+
+                if (curr->isWhite())
+                {
+                    FEN += toupper(curr->getType());
+                }
+                else
+                {
+                    FEN += curr->getType();
+                }
+            }
+        }
+        if (emptyCounter > 0)
+            FEN += to_string(emptyCounter);
+        if (i - 1 >= 0)
+            FEN += '/';
+        else
+            FEN += ' ';
+    }
+
+    if (board.isWhiteTurn())
+        FEN += "w ";
+    else
+        FEN += "b ";
+
+    king *wk = dynamic_cast<king *>(board.getAt(board.getKingPosition(true)));
+    king *bk = dynamic_cast<king *>(board.getAt(board.getKingPosition(false)));
+    bool whiteKingside = wk->getKingsideCastle();
+    bool whiteQueenside = wk->getQueensideCastle();
+    bool blackKingside = bk->getKingsideCastle();
+    bool blackQueenside = bk->getQueensideCastle();
+
+    if (!(whiteKingside || whiteQueenside || blackKingside || blackQueenside))
+        FEN += '-';
+    else
+    {
+        if (whiteKingside)
+            FEN += 'K';
+        if (whiteQueenside)
+            FEN += 'Q';
+        if (blackKingside)
+            FEN += 'k';
+        if (blackQueenside)
+            FEN += 'q';
+    }
+
+    FEN += ' ';
+
+    if (!board.isEnpassant())
+    {
+        FEN += "- ";
+    }
+    else
+    {
+        if (board.getEnpassantstr() != ""){
+            
+            FEN += board.getEnpassantstr();
+        }
+        else{
+            FEN += "-";
+        }
+        FEN += ' ';
+    }
+
+    FEN += to_string(board.getHalfmovesNoCaptures());
+    FEN += ' ';
+    FEN += to_string(board.getFullmoves());
+
+    return FEN;
+}
+
+void game::saveGame(board &board)
+{
+    filesystem::path Path = "SavedGames";
+
+    if (!filesystem::exists(Path))
+    {
+        if (filesystem::create_directory(Path))
+        {
+        }
+        else
+        {
+            cerr << "Failed to create Save folder." << endl;
+        }
+    }
+    string FEN = buildFEN(board);
+    cout << "Enter the name of the save file: ";
+    string filename;
+    cin >> filename;
+    if (filename.find_first_of("\\/:?\"<>|") != string::npos)
+    {
+        cerr << "Invalid filename. Please avoid using special characters like \\ / : ? \" < > |" << endl;
+        return;
+    }
+    ofstream outFile(Path / (filename + ".txt"));
+    if (outFile)
+    {
+        outFile << FEN;
+        outFile.close();
+        cout << "Game saved successfully." << endl;
+    }
+    else
+    {
+        cerr << "Failed to save game." << endl;
+    }
+
+    this_thread::sleep_for(chrono::seconds(2));
+}
+
+
+//// Incrementing halfmoves at the wrong time
+//// fullmoves not incrementing at the right time

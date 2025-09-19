@@ -14,7 +14,7 @@ int main() {
     int choice;
     int highlight = 0;
 
-    Normalgame game;
+    game game;
 
     while (true) {
         clear();
@@ -57,7 +57,7 @@ int main() {
                             delete Board;
                             return 0;
                         } else {
-                            cout << "Error: Invalid or malformed FEN string." << endl;
+                            cout << "Invalid or malformed FEN string." << endl;
                             cout << "Press Enter to return to the menu." << endl;
                             cin.get();
                             initscr();

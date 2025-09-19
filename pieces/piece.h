@@ -69,6 +69,8 @@ public:
     bool canQueensideCastle (board &Board);
     void setKingsideCastle ();
     void setQueensideCastle();
+    bool getKingsideCastle ();
+    bool getQueensideCastle();
     void resetKingsideCastle ();
     void resetQueensideCastle();
     void resetCastling();
