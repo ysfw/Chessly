@@ -1237,6 +1237,7 @@ void game ::run(board &board)
                 this_thread::sleep_for(chrono::seconds(2));
                 continue;
             }
+            cout << "Selected piece: " << selected->getprintableValue() << "  at " << input << endl;
             cout << "Possible moves (Red is capturable): ";
             for (pos move : moves)
             {
@@ -1432,39 +1433,59 @@ void game::loadGame()
 
         cout << i + 1 << ". " << saveName << " (Saved on: " << dateTime << ")" << endl;
     }
-
-    cout << "Enter the number of the game you want to load (or 0 to cancel): ";
-    size_t choice;
-    cin >> choice;
-
-    if (choice == 0)
+    string FEN;
+    while (true)
     {
-        cout << "Load cancelled." << endl;
-        this_thread::sleep_for(chrono::seconds(2));
-        return;
-    }
+        
+        cout << "Enter the number of the game you want to load (or 0 to cancel): ";
+        int choice;
+        cin >> choice;
 
-    if (choice < 1 || choice > lines.size())
-    {
-        cerr << "Invalid choice." << endl;
-        this_thread::sleep_for(chrono::seconds(2));
-        return;
-    }
+        if(cin.fail())
+        {
+            cerr << "Invalid input. Please enter a number." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            this_thread::sleep_for(chrono::seconds(2));
+            continue;
+        }
+        if (choice == 0)
+        {
+            cout << "Load cancelled." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            this_thread::sleep_for(chrono::seconds(2));
+            return;
+        }
+        if (choice < 1 || choice > lines.size())
+        {
+            cerr << "Invalid choice." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            this_thread::sleep_for(chrono::seconds(2));
+            continue;
+        }
 
-    stringstream ss(lines[choice - 1]);
-    string dateTime, saveName, FEN;
-    getline(ss, dateTime, ',');
-    getline(ss, saveName, ',');
-    getline(ss, FEN, ',');
+        stringstream ss(lines[choice - 1]);
+        string dateTime, saveName;
+        getline(ss, dateTime, ',');
+        getline(ss, saveName, ',');
+        getline(ss, FEN, ',');
+    
+        if (board::boardFromFEN(FEN) == nullptr)
+        {
+            cerr << "Failed to load the selected game." << endl;
+            this_thread::sleep_for(chrono::seconds(2));
+            return;
+        }
+        else
+        {
+            break;
+        }
 
-    if (board::boardFromFEN(FEN) == nullptr)
-    {
-        cerr << "Failed to load the selected game." << endl;
-        this_thread::sleep_for(chrono::seconds(2));
-        return;
     }
-    else
-    {
-        this->run(*board::boardFromFEN(FEN));
-    }
+    this->run(*board::boardFromFEN(FEN));
+    
+
+
 }

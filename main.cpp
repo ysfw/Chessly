@@ -37,7 +37,9 @@ int main() {
 
         } else if (choice == "3") {
             cout << "Loading saved games..." << endl;
+            clearScreen();
             game.loadGame();
+            
         } 
 
         else if (choice == "4") {
