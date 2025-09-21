@@ -81,6 +81,8 @@ Choose an option:
 
 ## Screenshots
 - Loading a saved game.
+
+
 ![Saved Games](Screenshots/savedGames.png)
 
 - screenshots of a game in progress, showing the ASCII board and move prompts.
