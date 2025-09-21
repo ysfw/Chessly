@@ -1,7 +1,3 @@
-//Use g++ -I. -o chess main.cpp game.cpp  pieces/*.cpp to compile
-//chcp 65001
-// valgrind --tool=memcheck --leak-check=yes ./chess
-
 #include "game.h"
 int main() {
     game game;
