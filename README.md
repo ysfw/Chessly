@@ -4,7 +4,7 @@ A CLI-based chess game engine and interface written in C++. This project provide
 ## Key Features
 
 - **Full Chess Logic:** All standard moves are implemented, including pawn promotion, en passant, and castling.
-- **Interactive Terminal Interface:** Play a full game from start to finish using the form Square to Square form (e.g., `e2`, `e4`) which I think is much easier for chess beginners to understand than the standard algebraic notaion -Just the distination as input-
+- **Interactive Terminal Interface:** Play a full game from start to finish using the form Square to Square form (e.g., `e2`, `e4`) which I think is much easier for chess beginners to understand than the standard algebraic notation -Just the distination as input-
 - **Save & Load Games:** Games can be saved at any point and loaded later to resume play.
 - **FEN Support:** Start a game from any board position by providing a valid Forsyth-Edwards Notation (FEN) string.
 
