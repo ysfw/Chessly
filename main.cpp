@@ -14,16 +14,14 @@ int main (){
         cout << "Choose an option: ";
 
         string choice;
-        cin >> choice;
+        getline(cin, choice);
 
         if (choice == "1") {
             board newBoard(true); 
             game.run(newBoard);   
-            break; 
 
         } else if (choice == "2") {
             cout << "Please enter the FEN string: " << endl;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             string fenString;
             getline(cin, fenString);
 
@@ -31,7 +29,6 @@ int main (){
 
                 board Board = *boardOptional; 
                 game.run(Board);       
-                break;
             } else {
                 cout << "Error: Invalid or malformed FEN string." << endl;
                 cout << "Press Enter to return to the menu." << endl;

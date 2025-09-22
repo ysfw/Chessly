@@ -977,10 +977,10 @@ vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
 
 char getPromotionPiece()
 {
-    char piece;
+    string piece;
     cout << "Choose What piece to promote to (N,Q,B,R): ";
-    cin >> piece;
-    return tolower(piece);
+    getline(cin, piece);
+    return tolower(piece[0]);
 }
 
 bool board::isPinned(piece *p, pos newPosition)
@@ -1251,9 +1251,9 @@ void game ::run(board &board)
         else if (board.is50MoveDraw())
         {
             cout << "Do you want to claim draw By 50 move rule? (y/n) : " << endl;
-            char choice;
-            cin >> choice;
-            if (tolower(choice) == 'y')
+            string choice;
+            getline(cin, choice);
+            if (tolower(choice[0]) == 'y')
             {
                 cout << "Draw By 50 move rule." << endl;
                 return;
@@ -1262,7 +1262,7 @@ void game ::run(board &board)
         whiteTurn ? board.printBoardW() : board.printBoardB();
         string input;
         cout << "Select a piece (e.g., e2 e4) , type exit to quit or save to save the game: ";
-        cin >> input;
+        getline(cin, input);
         transform(input.begin(), input.end(), input.begin(), ::tolower);
         if (input == "exit")
         {
@@ -1310,7 +1310,7 @@ void game ::run(board &board)
             }
             cout << endl;
             cout << "Play a move or type \"back\" to select another piece : ";
-            cin >> input;
+            getline(cin, input);
             transform(input.begin(), input.end(), input.begin(), ::tolower);
             if (input == "back")
                 continue;
@@ -1439,7 +1439,7 @@ void game::saveGame(board &board)
     // saving into a csv file with three columns (Date&Time,SaveName,FEN)
     cout << "Enter a name for the saved game: ";
     string saveName;
-    cin >> saveName;
+    getline(cin, saveName);
     ofstream outFile("SavedGames.csv", ios::app);
     if (outFile)
     {
