@@ -666,9 +666,10 @@ pos board ::getKingPosition(bool isWhite)
     return isWhite ? whiteKingPosition : blackKingPosition;
 }
 
-vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
+
+vector<AttackInfo> board ::AttackedBy(pos Position, bool isDefenderWhite)
 {
-    vector<piece *> result;
+    vector<AttackInfo> result;
     for (size_t i = 0; i < 8; i++)
     {
         for (size_t j = 0; j < 8; j++)
@@ -679,13 +680,15 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
             }
             else
             {
-                piece *currAttk;
+                set<pos> possiblePath;
+                AttackInfo currAttk;
                 if (pawn *p = dynamic_cast<pawn *>(this->getAt({i, j})))
                 {
                     int forwardOne = p->isWhite() ? p->getPosition().first + 1 : p->getPosition().first - 1;
                     if (forwardOne == Position.first && (Position.second == p->getPosition().second + 1 || Position.second == p->getPosition().second - 1))
                     {
-                        currAttk = p;
+                        currAttk.attacker = p;
+                        currAttk.path = possiblePath;
                         result.push_back(currAttk);
                     }
                 }
@@ -698,7 +701,8 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                         int secondCoord = (int)N->getPosition().second + direction.second;
                         if ((firstCoord < 8 && firstCoord >= 0 && secondCoord < 8 && secondCoord >= 0) && (firstCoord == Position.first && secondCoord == Position.second))
                         {
-                            currAttk = N;
+                            currAttk.attacker = N;
+                            currAttk.path = possiblePath;
                             result.push_back(currAttk);
                         }
                     }
@@ -707,6 +711,7 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (int direction = 1; direction < 5; direction++)
                     {
+                        possiblePath.clear();
 
                         for (size_t k = 1; k < 8; k++)
                         {
@@ -737,9 +742,22 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
 
-                                    currAttk = R;
+                                    currAttk.attacker = R;
+                                    currAttk.path = possiblePath;
                                     result.push_back(currAttk);
                                     break;
+                                }
+                                else
+                                {
+                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                    {
+                                        possiblePath.insert({firstCoord, secondCoord});
+                                    }
+                                    else
+                                    {
+                                        possiblePath.clear();
+                                        break;
+                                    }
                                 }
                             }
                             else
@@ -754,6 +772,7 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (size_t direction = 1; direction < 5; direction++)
                     {
+                        possiblePath.clear();
                         {
                             for (size_t k = 1; k < 8; k++)
                             {
@@ -788,9 +807,22 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                     if (firstCoord == Position.first && secondCoord == Position.second)
                                     {
 
-                                        currAttk = B;
+                                        currAttk.attacker = B;
+                                        currAttk.path = possiblePath;
                                         result.push_back(currAttk);
                                         break;
+                                    }
+                                    else
+                                    {
+                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                        {
+                                            possiblePath.insert({firstCoord, secondCoord});
+                                        }
+                                        else
+                                        {
+                                            possiblePath.clear();
+                                            break;
+                                        }
                                     }
                                 }
                                 else
@@ -804,6 +836,7 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                 {
                     for (int direction = 1; direction < 5; direction++)
                     {
+                        possiblePath.clear();
                         for (size_t k = 1; k < 8; k++)
                         {
                             size_t firstCoord, secondCoord;
@@ -838,9 +871,22 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                 if (firstCoord == Position.first && secondCoord == Position.second)
                                 {
 
-                                    currAttk = Q;
+                                    currAttk.attacker = Q;
+                                    currAttk.path = possiblePath;
                                     result.push_back(currAttk);
                                     break;
+                                }
+                                else
+                                {
+                                    if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                    {
+                                        possiblePath.insert({firstCoord, secondCoord});
+                                    }
+                                    else
+                                    {
+                                        possiblePath.clear();
+                                        break;
+                                    }
                                 }
                             }
                             else
@@ -849,6 +895,7 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                     }
                     for (size_t direction = 1; direction < 5; direction++)
                     {
+                        possiblePath.clear();
                         {
                             for (size_t k = 1; k < 8; k++)
                             {
@@ -883,9 +930,22 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                                     if (firstCoord == Position.first && secondCoord == Position.second)
                                     {
 
-                                        currAttk = Q;
+                                        currAttk.attacker = Q;
+                                        currAttk.path = possiblePath;
                                         result.push_back(currAttk);
                                         break;
+                                    }
+                                    else
+                                    {
+                                        if (this->getAt({firstCoord, secondCoord}) == nullptr)
+                                        {
+                                            possiblePath.insert({firstCoord, secondCoord});
+                                        }
+                                        else
+                                        {
+                                            possiblePath.clear();
+                                            break;
+                                        }
                                     }
                                 }
                                 else
@@ -903,7 +963,8 @@ vector<piece *> board ::AttackedBy(pos Position, bool isDefenderWhite)
                         int secondCoord = (int)K->getPosition().second + direction.second;
                         if ((firstCoord < 8 && firstCoord >= 0 && secondCoord < 8 && secondCoord >= 0) && (firstCoord == Position.first && secondCoord == Position.second))
                         {
-                            currAttk = K;
+                            currAttk.attacker = K;
+                            currAttk.path = possiblePath;
                             result.push_back(currAttk);
                         }
                     }
@@ -1149,7 +1210,6 @@ void game ::run(board &board)
     {
         bool whiteTurn = board.isWhiteTurn();
         clearScreen();
-
         // //debug zobrist History
         //     ofstream outputFile("output.txt", ios::app);
         //     if (!outputFile.is_open()) {
@@ -1441,7 +1501,8 @@ void game::loadGame()
         int choice;
         cin >> choice;
 
-        if(cin.fail())
+
+        if (cin.fail())
         {
             cerr << "Invalid input. Please enter a number." << endl;
             cin.clear();

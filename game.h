@@ -16,6 +16,17 @@ string buildFEN (board &board);
 
 const int NO_FILE = -1; 
 
+struct AttackInfo {
+    //<<<<<<< This turned out to be totally useless I'll need to remove it later....
+    //but I've decided that I'll keep it for now just in case I need it in the future and because
+    //I realized that it would require a lot of changes to remove it now
+    //====================================================================================
+
+    piece* attacker; // A pointer to the piece delivering the attack
+    set<pos> path; // The squares between the attacker and a given square.
+    // This will be EMPTY for direct attackers like knights and pawns.
+};
+
 class board
 {
 private:
@@ -85,7 +96,7 @@ public:
     
     void setAt(pos position,piece* Pointer2piece);
     piece* getAt(pos position);
-    vector<piece*> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
+    vector<AttackInfo> AttackedBy(pos Position,bool isDefenderWhite); //returns a vector containing the path of attack of pieces (bishop, rook and queen) attacking a given square and a pointer to the attacking piece
     bool isPinned(piece* piece, pos newPosition);
     void setKingPosition(bool isWhite, pos newPosition);
     pos getKingPosition(bool isWhite);
