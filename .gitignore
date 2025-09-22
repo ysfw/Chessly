@@ -7,3 +7,4 @@ main
 *.o
 chess
 vgcore.5429
+SavedGames.csv

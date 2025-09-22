@@ -1226,26 +1226,31 @@ void game ::run(board &board)
         if (board.isCheckmate(whiteTurn))
         {
             cout << "White Wins By Checkmate." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
             return;
         }
         else if (board.isCheckmate(!whiteTurn))
         {
             cout << "Black Wins By Checkmate." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
             return;
         }
         else if (board.isStalemate(whiteTurn))
         {
             cout << "Draw By Stalemate." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
             return;
         }
         else if (board.isInsufficientMaterial())
         {
             cout << "Draw By Insufficient Material." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
             return;
         }
         else if (board.is75MoveDraw())
         {
             cout << "Draw By 75 move rule." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
             return;
         }
         else if (board.is50MoveDraw())
@@ -1256,6 +1261,7 @@ void game ::run(board &board)
             if (tolower(choice[0]) == 'y')
             {
                 cout << "Draw By 50 move rule." << endl;
+            this_thread::sleep_for(chrono::seconds(3));
                 return;
             }
         }
@@ -1526,7 +1532,7 @@ void game::loadGame()
             this_thread::sleep_for(chrono::seconds(2));
             continue;
         }
-        
+
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');    
         stringstream ss(lines[choice - 1]);
