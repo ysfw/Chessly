@@ -1,4 +1,4 @@
-# Chessly ♟️
+# Chessy ♟️
 A CLI-based chess game engine and interface written in C++. This project provides a complete chess-playing experience in the terminal, featuring full move validation, game state detection, and the ability to save and load positions using FEN strings.
 
 ## Key Features
@@ -30,14 +30,14 @@ You will need a C++ compiler that supports C++17 or newer. The most common compi
 Clone the repository:
 
 ```bash
-git clone https://github.com/ysfw/Chessly.git
+git clone https://github.com/ysfw/Chessy.git
 ```
 
 Compile the source code:  
-Use the following command to compile all necessary files into a single executable named `chessly`:
+Use the following command to compile all necessary files into a single executable named `chessy`:
 
 ```bash
-g++ -I. -o chessly main.cpp game.cpp pieces/*.cpp
+g++ -I. -o chessy main.cpp game.cpp pieces/*.cpp
 ```
 
 > Note: The `-I.` flag tells the compiler to look for included header files in the current directory.
@@ -61,7 +61,7 @@ After launching the executable, you will be greeted with the main menu.
 
 ### Main Menu
 ```
---- Chessly ---
+--- Chessy ---
 1. New Game
 2. Load from FEN
 3. Load Saved Game

@@ -17,8 +17,9 @@ int main (){
         getline(cin, choice);
 
         if (choice == "1") {
-            board newBoard(true); 
-            game.run(newBoard);   
+            board newBoard(true);
+            game.run(newBoard);
+            break;
 
         } else if (choice == "2") {
             cout << "Please enter the FEN string: " << endl;
@@ -28,7 +29,8 @@ int main (){
             if (auto boardOptional = board::boardFromFEN(fenString)) {
 
                 board Board = *boardOptional; 
-                game.run(Board);       
+                game.run(Board); 
+                break;      
             } else {
                 cout << "Error: Invalid or malformed FEN string." << endl;
                 cout << "Press Enter to return to the menu." << endl;
@@ -41,6 +43,7 @@ int main (){
             cout << "Loading saved games..." << endl;
             clearScreen();
             game.loadGame();
+            break;
         }
         else if (choice == "4")
         {
