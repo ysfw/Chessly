@@ -1526,7 +1526,9 @@ void game::loadGame()
             this_thread::sleep_for(chrono::seconds(2));
             continue;
         }
-
+        
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');    
         stringstream ss(lines[choice - 1]);
         string dateTime, saveName;
         getline(ss, dateTime, ',');
